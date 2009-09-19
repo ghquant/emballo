@@ -1,0 +1,48 @@
+﻿	<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+		<PropertyGroup>
+			<ProjectGuid>{1866EA65-3CFB-4612-B7C0-F03FEF82B600}</ProjectGuid>
+		</PropertyGroup>
+		<ItemGroup>
+			<Projects Include="Emballo.dproj">
+				<Dependencies/>
+			</Projects>
+			<Projects Include="EmballoTests.dproj">
+				<Dependencies/>
+			</Projects>
+		</ItemGroup>
+		<ProjectExtensions>
+			<Borland.Personality>Default.Personality.12</Borland.Personality>
+			<Borland.ProjectType/>
+			<BorlandProject>
+				<Default.Personality/>
+			</BorlandProject>
+		</ProjectExtensions>
+		<Target Name="Emballo">
+			<MSBuild Projects="Emballo.dproj"/>
+		</Target>
+		<Target Name="Emballo:Clean">
+			<MSBuild Targets="Clean" Projects="Emballo.dproj"/>
+		</Target>
+		<Target Name="Emballo:Make">
+			<MSBuild Targets="Make" Projects="Emballo.dproj"/>
+		</Target>
+		<Target Name="EmballoTests">
+			<MSBuild Projects="EmballoTests.dproj"/>
+		</Target>
+		<Target Name="EmballoTests:Clean">
+			<MSBuild Targets="Clean" Projects="EmballoTests.dproj"/>
+		</Target>
+		<Target Name="EmballoTests:Make">
+			<MSBuild Targets="Make" Projects="EmballoTests.dproj"/>
+		</Target>
+		<Target Name="Build">
+			<CallTarget Targets="Emballo;EmballoTests"/>
+		</Target>
+		<Target Name="Clean">
+			<CallTarget Targets="Emballo:Clean;EmballoTests:Clean"/>
+		</Target>
+		<Target Name="Make">
+			<CallTarget Targets="Emballo:Make;EmballoTests:Make"/>
+		</Target>
+		<Import Project="$(BDS)\Bin\CodeGear.Group.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Group.Targets')"/>
+	</Project>
