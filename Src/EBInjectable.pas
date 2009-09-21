@@ -31,10 +31,14 @@ type
 
 implementation
 
+uses
+  EBDependencyInjection;
+
 { TInjectable }
 
 constructor TInjectable.Create;
 begin
+  InjectDependencies(Self);
 end;
 
 end.
