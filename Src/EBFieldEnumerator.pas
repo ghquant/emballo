@@ -163,6 +163,7 @@ end;
 
 procedure TFieldData.Inject(Instance: TObject; Value: IInterface);
 var
+  FieldPointer: PPointer;
   P: Pointer;
 begin
   if not Supports(Value, GetGuid, P) then
@@ -171,7 +172,14 @@ begin
     if not Instance.InheritsFrom(GetDeclaringClass) then
       raise EInvalidType.Create('The object to receive the injection must be the same or a subclass of the class where the field was declared');
 
-    Move(P, Pointer(Cardinal(Instance) + FOffset)^, 4);
+    FieldPointer := Pointer(Cardinal(Instance) + FOffset);
+
+    { If the field has already been assigned, we have to _Release the current
+      value before assign the new one }
+    if Assigned(FieldPointer^) then
+      IInterface(FieldPointer^)._Release;
+
+    FieldPointer^ := P;
 
     { We made the assignment as a pointer move operation. This doesnt increment
       the ref count, so we have to do it by ourselves }

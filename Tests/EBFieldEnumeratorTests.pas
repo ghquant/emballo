@@ -105,6 +105,7 @@ var
   Instance: TMyObject;
   Fields: TFieldsData;
   InterfaceA: IInterfaceA;
+  PreviousInterfaceA: IInterfaceA;
   O: TObject;
 begin
   Fields := EnumerateFields(TMyObject);
@@ -136,6 +137,12 @@ begin
     Fields[0].Inject(Instance, InterfaceA);
     CheckTrue(Instance.FInterfaceA = InterfaceA);
     CheckEquals(2, InterfaceA.GetReferenceCount, 'There must be two references now: One for the variable declared here and one for the injected reference');
+
+    PreviousInterfaceA := TInterfaceA.Create;
+    Instance.FInterfaceA := PreviousInterfaceA;
+    InterfaceA := TInterfaceA.Create;
+    Fields[0].Inject(Instance, InterfaceA);
+    CheckEquals(1, PreviousInterfaceA.GetReferenceCount, 'If the field is assigned, we have to call release the reference before inject the new one');
   finally
     Instance.Free;
   end;
