@@ -6,6 +6,9 @@
 			<Projects Include="Emballo.dproj">
 				<Dependencies/>
 			</Projects>
+			<Projects Include="EmballoDUnitUtil.dproj">
+				<Dependencies>Emballo.dproj</Dependencies>
+			</Projects>
 			<Projects Include="EmballoTests.dproj">
 				<Dependencies/>
 			</Projects>
@@ -26,6 +29,15 @@
 		<Target Name="Emballo:Make">
 			<MSBuild Targets="Make" Projects="Emballo.dproj"/>
 		</Target>
+		<Target DependsOnTargets="Emballo" Name="EmballoDUnitUtil">
+			<MSBuild Projects="EmballoDUnitUtil.dproj"/>
+		</Target>
+		<Target DependsOnTargets="Emballo:Clean" Name="EmballoDUnitUtil:Clean">
+			<MSBuild Targets="Clean" Projects="EmballoDUnitUtil.dproj"/>
+		</Target>
+		<Target DependsOnTargets="Emballo:Make" Name="EmballoDUnitUtil:Make">
+			<MSBuild Targets="Make" Projects="EmballoDUnitUtil.dproj"/>
+		</Target>
 		<Target Name="EmballoTests">
 			<MSBuild Projects="EmballoTests.dproj"/>
 		</Target>
@@ -36,13 +48,13 @@
 			<MSBuild Targets="Make" Projects="EmballoTests.dproj"/>
 		</Target>
 		<Target Name="Build">
-			<CallTarget Targets="Emballo;EmballoTests"/>
+			<CallTarget Targets="Emballo;EmballoDUnitUtil;EmballoTests"/>
 		</Target>
 		<Target Name="Clean">
-			<CallTarget Targets="Emballo:Clean;EmballoTests:Clean"/>
+			<CallTarget Targets="Emballo:Clean;EmballoDUnitUtil:Clean;EmballoTests:Clean"/>
 		</Target>
 		<Target Name="Make">
-			<CallTarget Targets="Emballo:Make;EmballoTests:Make"/>
+			<CallTarget Targets="Emballo:Make;EmballoDUnitUtil:Make;EmballoTests:Make"/>
 		</Target>
 		<Import Project="$(BDS)\Bin\CodeGear.Group.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Group.Targets')"/>
 	</Project>
