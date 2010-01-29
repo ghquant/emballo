@@ -1,0 +1,114 @@
+    Emballo is all about getting implementations of interfaces without
+the client code (the code that requests the implementation) having to
+know who actually implements that interface.
+
+    In order to get this, you have to first tell the framework how to
+get instances of interfaces you want to support. This is done by
+implementing factories and registering them within the framework.
+
+    A factory is an object that knows how to get implementations of
+some interface. They are implementations of the interface
+EbFactory.IFactory. You can see that interface here:
+
+type
+  IFactory = interface
+    ['{F5603417-3D80-4735-B66D-84FFAC15770B}']
+
+    function TryBuild(Intf: TGUID; out Instance: IInterface): Boolean;
+  end;
+
+The implementation is very simple: When the TryBuild method is called,
+if your factory knows how to get instances of the "Intf" interface,
+then it must put the instance on the "Instance" parameter and return
+True. Otherwise, return False.
+
+Once the factory is implemented, you must register it within the
+framework. This is done via EbFactory.RegisterFactory procedure.
+
+Fortunatelly, the framework comes with default implementations of
+IFactory that cover some common use cases and the "RegisterFactory"
+procedure is overloaded so that you can just call it passing some
+parameters and it will take care of instantiating the correct IFactory
+implementation and registering it. Now we'll see the three overloads
+of "RegisterFactory:
+
+  * procedure RegisterFactory(const Factory: IFactory);
+
+    This is the fundamental RegisterFactory overload. You can implement
+any factory you need and register it here. The other overloads call this
+behind the scenes
+
+  * procedure RegisterFactory(const GUID: TGUID; Implementor: TClass);
+
+    This is the most common way of registering a factory. You just
+specify the GUID of an interface and a class that implements it, and
+the framework will take care of instantiating the class. If the class
+has a constructor that requires other dependecies, they will also be
+instantiated automatically (using the mechanisms explained next) before
+the constructor is called.
+
+  * procedure RegisterFactory(const GUID: TGUID; const Instance: IInterface);
+
+    This will register a kind of singleton factory. That is: You specify
+an interface GUID, and an instance that implements the interface. And
+then this instance will be returned every time the framework requests
+an instance of that interface. Note that here the programmer is
+responsible for setting up the instance. This may be very useful on
+unit tests.
+
+    Now that the framework knows how to get implementations of your
+interfaces, you can start using it. There are a few ways for doing this,
+using the EbCore unit
+
+  * function BuildInstance(Guid: TGUID): IInterface;
+
+    Here you requests the implementation of a specific interface, and
+the framework will get it for you. If no implementation can be returned,
+an exception is raised. This is useful when you need an instance locally
+inside a method. For exemple:
+
+type
+  TClientObject = class
+  public
+    procedure DoSomething;
+  end;
+
+procedure TClientObject.DoSomething;
+var
+  Dependency: IDependency;
+begin
+  Dependency := BuildInstance(IDependency) as IDependency;
+  Dependency.DoSomething;
+end;
+
+  * procedure HiddenInjection(Instance: TObject);
+
+    This will list all fields of the "Instance" object and try to inject
+them. But only interface fields that are set to nil at the time of the
+call can be injected. And for those fields for which no instance can
+be found, no exception is raised (Different from the "BuildInstance"
+function). This procedure is likely to be called from within the object
+itself during it's initialization. For exemple:
+
+type
+  TClientObject = class
+  private
+    FDependencyA: IDependencyA;
+    FDependencyB: IDependencyB;
+  public
+    constructor Create;
+  end;
+
+constructor TClientObject.Create;
+begin
+  HiddenInjection(Self);
+  { If the factories had been properly set up, now the fields
+    FDependencyA and FDependencyB are already initialized. }
+end;
+
+    Note that no matter how you ask the framework for implementations of
+your interfaces (either via BuildInstance or HiddenInjection), the
+framework will try to get the instances via all of the registered
+factories, and the strategy that each factory will use to obtain the
+instance is specific for the implementation of each factory, as we saw
+above.

@@ -1,0 +1,21 @@
+This is a very simple demo that shows Emballo's features.
+
+The application just displays a greeting message to the user based on
+the current time.
+
+There are two services that get injected:
+  * IGreetingService is used to analyse the current time and returns
+    the greeting message.
+
+  * ITimeService is used by IGreetingService to get the current time.
+    It is a abstraction layer over the windows time routines
+
+When the main form is created, it asks Emballo to perform the so called
+"hidden injection". This kind of injection consists of getting all
+fields of the object where the injections will occur and inject the
+dependecies on the apropriated fields. This will put an implementation
+of IGreetingService inside the form.
+
+There are three implementations of IGreetingService, each one showing
+a different way of getting the ITimeService implementation. Please look
+at the .dpr for more details.

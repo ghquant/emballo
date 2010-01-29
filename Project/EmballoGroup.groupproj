@@ -1,0 +1,60 @@
+﻿	<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+		<PropertyGroup>
+			<ProjectGuid>{07D54FB0-2230-45DE-A0AB-16D303A1F39A}</ProjectGuid>
+		</PropertyGroup>
+		<ItemGroup>
+			<Projects Include="Emballo.dproj">
+				<Dependencies/>
+			</Projects>
+			<Projects Include="EmballoTests.dproj">
+				<Dependencies>Emballo.dproj</Dependencies>
+			</Projects>
+			<Projects Include="..\Demo\Project\Demo.dproj">
+				<Dependencies/>
+			</Projects>
+		</ItemGroup>
+		<ProjectExtensions>
+			<Borland.Personality>Default.Personality.12</Borland.Personality>
+			<Borland.ProjectType/>
+			<BorlandProject>
+				<Default.Personality/>
+			</BorlandProject>
+		</ProjectExtensions>
+		<Target Name="Emballo">
+			<MSBuild Projects="Emballo.dproj"/>
+		</Target>
+		<Target Name="Emballo:Clean">
+			<MSBuild Targets="Clean" Projects="Emballo.dproj"/>
+		</Target>
+		<Target Name="Emballo:Make">
+			<MSBuild Targets="Make" Projects="Emballo.dproj"/>
+		</Target>
+		<Target DependsOnTargets="Emballo" Name="EmballoTests">
+			<MSBuild Projects="EmballoTests.dproj"/>
+		</Target>
+		<Target DependsOnTargets="Emballo:Clean" Name="EmballoTests:Clean">
+			<MSBuild Targets="Clean" Projects="EmballoTests.dproj"/>
+		</Target>
+		<Target DependsOnTargets="Emballo:Make" Name="EmballoTests:Make">
+			<MSBuild Targets="Make" Projects="EmballoTests.dproj"/>
+		</Target>
+		<Target Name="Demo">
+			<MSBuild Projects="..\Demo\Project\Demo.dproj"/>
+		</Target>
+		<Target Name="Demo:Clean">
+			<MSBuild Targets="Clean" Projects="..\Demo\Project\Demo.dproj"/>
+		</Target>
+		<Target Name="Demo:Make">
+			<MSBuild Targets="Make" Projects="..\Demo\Project\Demo.dproj"/>
+		</Target>
+		<Target Name="Build">
+			<CallTarget Targets="Emballo;EmballoTests;Demo"/>
+		</Target>
+		<Target Name="Clean">
+			<CallTarget Targets="Emballo:Clean;EmballoTests:Clean;Demo:Clean"/>
+		</Target>
+		<Target Name="Make">
+			<CallTarget Targets="Emballo:Make;EmballoTests:Make;Demo:Make"/>
+		</Target>
+		<Import Project="$(BDS)\Bin\CodeGear.Group.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Group.Targets')"/>
+	</Project>
