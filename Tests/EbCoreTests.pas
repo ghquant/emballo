@@ -27,7 +27,7 @@ type
   protected
     procedure TearDown; override;
   published
-    procedure TestInjectDependencies;
+    procedure TestHiddenInjection;
     procedure TestBuildInstance;
   end;
 
@@ -85,7 +85,7 @@ begin
   end;
 end;
 
-procedure TEbCoreTests.TestInjectDependencies;
+procedure TEbCoreTests.TestHiddenInjection;
 var
   Cli: TClient;
   Cli2: TClientWithTwoDependencies;
@@ -95,12 +95,12 @@ begin
   Cli := TClient.Create;
   Cli.FDependency := TDependency.Create;
   Cli.FDependency.SetId(1);
-  InjectDependencies(Cli);
+  HiddenInjection(Cli);
   CheckEquals(1, Cli.FDependency.GetId, 'InjectDependencies should preserve field values when the fields are already set');
 
   { 2. Test if all available fields are injected }
   Cli2 := TClientWithTwoDependencies.Create;
-  InjectDependencies(Cli2);
+  HiddenInjection(Cli2);
   CheckNotNull(Cli2.FDependency1, 'InjectDependencies must inject into all injectable fields');
   CheckNotNull(Cli2.FDependency2, 'InjectDependencies must inject into all injectable fields');
 end;

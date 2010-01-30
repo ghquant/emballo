@@ -59,8 +59,6 @@ end;
 function GetTypeInfoFromGUID(GUID: TGUID): PTypeInfo;
 var
   Ctx: TRttiContext;
-  Types: TArray<TRttiType>;
-  LType: TRttiType;
 begin
   Ctx := TRttiContext.Create;
   try
