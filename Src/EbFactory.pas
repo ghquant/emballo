@@ -30,6 +30,7 @@ type
 
     function GetGUID: TGUID;
 
+    { The GUID that this factory can handle }
     property GUID: TGUID read GetGUID;
 
     { This method is called when the framework needs an instance the interface

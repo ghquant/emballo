@@ -20,17 +20,16 @@ unit EbDynamicFactory;
 interface
 
 uses
-  EbFactory;
+  EbFactory, EbAbstractFactory;
 
 type
   { A factory thet relies on EbInsantiator.TInstantiator to dynamicaly build
     the instances }
-  TDynamicFactory = class(TInterfacedObject, IFactory)
+  TDynamicFactory = class(TAbstractFactory)
   private
-    FGUID: TGUID;
     FImplementor: TClass;
-    function GetGUID: TGUID;
-    function GetInstance: IInterface;
+  protected
+    function GetInstance: IInterface; override;
   public
     constructor Create(GUID: TGUID; Implementor: TClass);
   end;
@@ -43,13 +42,8 @@ uses EbInstantiator, SysUtils;
 
 constructor TDynamicFactory.Create(GUID: TGUID; Implementor: TClass);
 begin
-  FGUID := GUID;
+  inherited Create(GUID);
   FImplementor := Implementor;
-end;
-
-function TDynamicFactory.GetGUID: TGUID;
-begin
-  Result := FGUID;
 end;
 
 function TDynamicFactory.GetInstance: IInterface;
@@ -60,7 +54,7 @@ begin
   Inst := TInstantiator.Create;
   try
     LInstance := Inst.Instantiate(FImplementor);
-    Supports(LInstance, FGUID, Result);
+    Supports(LInstance, GetGUID, Result);
   finally
     Inst.Free;
   end;

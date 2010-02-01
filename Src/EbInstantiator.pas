@@ -35,6 +35,8 @@ type
     function TryExecuteConstructor(AClass: TClass; Ctor: TRttiMethod;
       out Instance: TObject): Boolean;
   public
+    constructor Create;
+    destructor Destroy; override;
 
     { This method tries to build an instance of the given class and returns it.
 
@@ -78,9 +80,6 @@ type
       If after all the class cannot be instantiated, an ENoSuitableConstructor
       will be raised }
     function Instantiate(AClass: TClass): TObject;
-  public
-    constructor Create;
-    destructor Destroy; override;
   end;
 
   ENoSuitableConstructor = class(Exception)

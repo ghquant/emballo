@@ -15,40 +15,37 @@
     You should have received a copy of the GNU General Public License
     along with Foobar.  If not, see <http://www.gnu.org/licenses/>. }
 
-unit EbSingletonFactory;
+unit EbAbstractFactory;
 
 interface
 
 uses
-  EbAbstractFactory;
+  EbFactory;
 
 type
-  { A factory that will always return the same instance. Like a singleton }
-  TSingletonFactory = class(TAbstractFactory)
+  { Base class for implementing factories }
+  TAbstractFactory = class abstract(TInterfacedObject, IFactory)
   private
-    FInstance: IInterface;
+    FGUID: TGUID;
   protected
-    function GetInstance: IInterface; override;
+    function GetGUID: TGUID;
+    function GetInstance: IInterface; virtual; abstract;
   public
-    constructor Create(GUID: TGUID; const Instance: IInterface);
+    constructor Create(GUID: TGUID);
   end;
 
 implementation
 
-uses
-  SysUtils;
+{ TAbstractFactory }
 
-{ TSingletonFactory }
-
-constructor TSingletonFactory.Create(GUID: TGUID; const Instance: IInterface);
+constructor TAbstractFactory.Create(GUID: TGUID);
 begin
-  inherited Create(GUID);
-  FInstance := Instance;
+  FGUID := GUID;
 end;
 
-function TSingletonFactory.GetInstance: IInterface;
+function TAbstractFactory.GetGUID: TGUID;
 begin
-  Result := FInstance;
+  Result := FGUID;
 end;
 
 end.
