@@ -21,15 +21,12 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, UGreetingService, EbCore, StdCtrls;
+  Dialogs, StdCtrls;
 
 type
   TFrmMain = class(TForm)
     Button1: TButton;
-    procedure FormCreate(Sender: TObject);
     procedure Button1Click(Sender: TObject);
-  private
-    FGreetingService: IGreetingService;
   end;
 
 var
@@ -37,16 +34,17 @@ var
 
 implementation
 
+uses
+  UGreetingService, EbCore;
+
 {$R *.dfm}
 
 procedure TFrmMain.Button1Click(Sender: TObject);
+var
+  GreetingService: IGreetingService;
 begin
-  ShowMessage(FGreetingService.Greeting);
-end;
-
-procedure TFrmMain.FormCreate(Sender: TObject);
-begin
-  HiddenInjection(Self);
+  GreetingService := Emballo.Get<IGreetingService>;
+  ShowMessage(GreetingService.Greeting);
 end;
 
 end.

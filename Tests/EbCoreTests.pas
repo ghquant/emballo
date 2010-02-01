@@ -23,37 +23,13 @@ uses
   TestFramework;
 
 type
-  TEbCoreTests = class(TTestCase)
-  protected
-    procedure TearDown; override;
+  TEmballoTests = class(TTestCase)
   published
-    procedure TestHiddenInjection;
-    procedure TestBuildInstance;
-  end;
-
-  IDependency = interface
-    ['{4E6BF186-C440-43D8-A7BA-DF50A54A1ACD}']
-    function GetId: Integer;
-    procedure SetId(Value: Integer);
+    procedure TestGet;
   end;
 
   INotRegisteredInterface = interface
     ['{5AE8F8FE-AE96-4250-B901-884F647EC48B}']
-  end;
-
-  TDependency = class(TInterfacedObject, IDependency)
-  private
-    FId: Integer;
-    function GetId: Integer;
-    procedure SetId(Value: Integer);
-  end;
-
-  TClient = class
-    FDependency: IDependency;
-  end;
-
-  TClientWithTwoDependencies = class
-    FDependency1, FDependency2: IDependency;
   end;
 
 var
@@ -62,63 +38,31 @@ var
 implementation
 
 uses
-  EbRegistry, EbCore;
+  EbRegistry, EbCore, SysUtils;
 
-{ TEbCoreTests }
+{ TEmballoTests }
 
-procedure TEbCoreTests.TearDown;
+procedure TEmballoTests.TestGet;
 begin
-  inherited;
-  ClearRegistry;
-end;
-
-procedure TEbCoreTests.TestBuildInstance;
-var
-  Instance: INotRegisteredInterface;
-begin
-  { 1. Test if it raises an exception if the instance can't be built }
+  { 1. Test if an exception is raised if we call Emballo.Get with a non interface type }
   try
-    Instance := BuildInstance(INotRegisteredInterface) as INotRegisteredInterface;
+    Emballo.Get<TObject>;
+    Fail('Calling Emballo.Get with a type other than an interface type must raise a EArgumentException');
+  except
+    on EArgumentException do CheckTrue(True);
+  end;
+
+  { 2. Test if it raises an exception if the instance can't be built }
+  try
+    Emballo.Get<INotRegisteredInterface>;
     Fail('Calling BuildInstance for an interface that can''t be instantiated must raise an ECouldNotBuild');
   except
     on ECouldNotBuild do CheckTrue(True);
   end;
 end;
 
-procedure TEbCoreTests.TestHiddenInjection;
-var
-  Cli: TClient;
-  Cli2: TClientWithTwoDependencies;
-begin
-  { 1. Test if only fields set to nil are touched }
-  RegisterFactory(IDependency, TDependency);
-  Cli := TClient.Create;
-  Cli.FDependency := TDependency.Create;
-  Cli.FDependency.SetId(1);
-  HiddenInjection(Cli);
-  CheckEquals(1, Cli.FDependency.GetId, 'InjectDependencies should preserve field values when the fields are already set');
-
-  { 2. Test if all available fields are injected }
-  Cli2 := TClientWithTwoDependencies.Create;
-  HiddenInjection(Cli2);
-  CheckNotNull(Cli2.FDependency1, 'InjectDependencies must inject into all injectable fields');
-  CheckNotNull(Cli2.FDependency2, 'InjectDependencies must inject into all injectable fields');
-end;
-
-{ TDependency }
-
-function TDependency.GetId: Integer;
-begin
-  Result := FId;
-end;
-
-procedure TDependency.SetId(Value: Integer);
-begin
-  FId := Value;
-end;
-
 initialization
 Info := TypeInfo(INotRegisteredInterface);
-RegisterTest(TEbCoreTests.Suite);
+RegisterTest(TEmballoTests.Suite);
 
 end.

@@ -23,67 +23,26 @@ uses
   SysUtils;
 
 type
+  TEmballo = class
+  public
+    function Get<ServiceInterface>: ServiceInterface;
+  end;
+
   ECouldNotBuild = class(Exception)
   public
     constructor Create(const GUID: TGUID);
   end;
 
-{ Try to inject all of "Instance" fields.
-  Only interface fields can be injected.
-  Only fields that are set to nil can be injected.
-  This kind of injection is called "hidden injection" because the field may be
-  completelly hidden inside the class, as it doesn't use property, setter nor
-  constructor to do it's job }
-procedure HiddenInjection(Instance: TObject);
-
-{ Try to build an instance of the given interface. Raises an ECouldNotBuild
-  if no instance can be build }
-function BuildInstance(Guid: TGUID): IInterface;
+function Emballo: TEmballo;
 
 implementation
 
 uses
   Rtti, EbInstantiator, EbRegistry, EbUtil, TypInfo;
 
-procedure HiddenInjection(Instance: TObject);
-var
-  Ctx: TRttiContext;
-  RttiType: TRttiType;
-  Fields: TArray<TRttiField>;
-  Field: TRttiField;
-  InterfaceField: TRttiInterfaceType;
-  FieldValue: IInterface;
-  Value: TValue;
+function Emballo: TEmballo;
 begin
-  Ctx := TRttiContext.Create;
-  try
-    RttiType := Ctx.GetType(Instance.ClassType);
-    Fields := RttiType.GetFields;
-    for Field in Fields do
-    begin
-      Value := Field.GetValue(Instance);
-      if Value.IsEmpty then
-      begin
-        if Field.FieldType.TypeKind = tkInterface then
-        begin
-          InterfaceField := Field.FieldType as TRttiInterfaceType;
-          if TryBuild(InterfaceField.GUID, FieldValue) then
-          begin
-            TValue.Make(@FieldValue, GetTypeInfoFromGUID(InterfaceField .GUID), Value);
-            Field.SetValue(Instance, Value);
-          end;
-        end;
-      end;
-    end;
-  finally
-    Ctx.Free;
-  end;
-end;
-
-function BuildInstance(Guid: TGUID): IInterface;
-begin
-  if not TryBuild(Guid, Result) then
-    raise ECouldNotBuild.Create(Guid);
+  Result := Nil;
 end;
 
 { ECouldNotBuild }
@@ -99,6 +58,31 @@ begin
     RttiType := GetRttiTypeFromGUID(Ctx, GUID);
     InterfaceName := RttiType.Name;
     inherited Create('Could not instantiate ' + InterfaceName);
+  finally
+    Ctx.Free;
+  end;
+end;
+
+{ TEmballo }
+
+function TEmballo.Get<ServiceInterface>: ServiceInterface;
+var
+  Service: IInterface;
+  Ctx: TRttiContext;
+  ServiceRttiType: TRttiType;
+  ServiceGUID: TGUID;
+begin
+  Ctx := TRttiContext.Create;
+  try
+    ServiceRttiType := Ctx.GetType(TypeInfo(ServiceInterface));
+    if ServiceRttiType.TypeKind <> tkInterface then
+      raise EArgumentException.Create('Emballo.Get must be called only with interface types');
+
+    ServiceGUID := (ServiceRttiType as TRttiInterfaceType).GUID;
+    if not TryBuild(ServiceGUID, Service) then
+      raise ECouldNotBuild.Create(ServiceGUID);
+
+    Supports(Service, ServiceGUID, Result);
   finally
     Ctx.Free;
   end;

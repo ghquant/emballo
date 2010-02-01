@@ -34,20 +34,6 @@ type
     constructor Create(const TimeService: ITimeService);
   end;
 
-  { This implementation of IGreetingService uses a techinique called "hidden
-    injection" to get its dependencies (that is, the ITimeService
-    implementation). The dependencies are injected directlly in the fields,
-    without using properties, setters or constructor arguments. But for that
-    happens, one has to call EbCore.HiddenInjection. Usually this call will go
-    on the object's contructor or on the AfterConstruction method }
-  TGreetingServiceWithHiddenInjection = class(TInterfacedObject, IGreetingService)
-  private
-    FTimeService: ITimeService;
-    function GetGreeting: string;
-  public
-    constructor Create;
-  end;
-
   { This implementation of IGreetingService manually asks the framework for an
     instance of ITimeService every time it is needed }
   TGreetingServiceManualyGetTimeService = class(TInterfacedObject, IGreetingService)
@@ -80,26 +66,6 @@ begin
     Result := 'Good evening';
 end;
 
-{ TGreetingServiceWithHiddenInjection }
-
-constructor TGreetingServiceWithHiddenInjection.Create;
-begin
-  HiddenInjection(Self);
-end;
-
-function TGreetingServiceWithHiddenInjection.GetGreeting: string;
-var
-  Hour: Word;
-begin
-  Hour := HourOf(FTimeService.Now);
-  if Hour in [6..11] then
-    Result := 'Good morning'
-  else if Hour in [12..18] then
-    Result := 'Good afternoon'
-  else
-    Result := 'Good evening';
-end;
-
 { TGreetingServiceManualyGetTimeService }
 
 function TGreetingServiceManualyGetTimeService.GetGreeting: string;
@@ -107,7 +73,7 @@ var
   Hour: Word;
   TimeService: ITimeService;
 begin
-  TimeService := BuildInstance(ITimeService) as ITimeService;
+  TimeService := Emballo.Get<ITimeService>;
   Hour := HourOf(TimeService.Now);
   if Hour in [6..11] then
     Result := 'Good morning'

@@ -27,11 +27,12 @@ type
     the instances }
   TDynamicFactory = class(TInterfacedObject, IFactory)
   private
-    FIntf: TGUID;
+    FGUID: TGUID;
     FImplementor: TClass;
-    function TryBuild(Intf: TGUID; out Instance: IInterface): Boolean;
+    function GetGUID: TGUID;
+    function GetInstance: IInterface;
   public
-    constructor Create(Intf: TGUID; Implementor: TClass);
+    constructor Create(GUID: TGUID; Implementor: TClass);
   end;
 
 implementation
@@ -40,27 +41,26 @@ uses EbInstantiator, SysUtils;
 
 { TDynamicFactory }
 
-constructor TDynamicFactory.Create(Intf: TGUID; Implementor: TClass);
+constructor TDynamicFactory.Create(GUID: TGUID; Implementor: TClass);
 begin
-  FIntf := Intf;
+  FGUID := GUID;
   FImplementor := Implementor;
 end;
 
-function TDynamicFactory.TryBuild(Intf: TGUID;
-  out Instance: IInterface): Boolean;
+function TDynamicFactory.GetGUID: TGUID;
+begin
+  Result := FGUID;
+end;
+
+function TDynamicFactory.GetInstance: IInterface;
 var
   Inst: TInstantiator;
   LInstance: TObject;
 begin
-  if not IsEqualGUID(FIntf, Intf) then
-    Exit(False);
-
-  Result := True;
-
   Inst := TInstantiator.Create;
   try
     LInstance := Inst.Instantiate(FImplementor);
-    Supports(LInstance, Intf, Instance);
+    Supports(LInstance, FGUID, Result);
   finally
     Inst.Free;
   end;

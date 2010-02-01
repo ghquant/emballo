@@ -33,11 +33,10 @@ begin
   RegisterFactory(ITimeService, TTimeService);
 
   { *************************************************************************
-    * Each of these three IGreetingService implementation show a different  *
+    * Each of these two IGreetingService implementation show a different    *
     * way for getting the ITimeService instance. Choose one                 *
     ************************************************************************* }
   RegisterFactory(IGreetingService, TGreetingServiceWithConstructorInjection);
-//  RegisterFactory(IGreetingService, TGreetingServiceWithHiddenInjection);
 //  RegisterFactory(IGreetingService, TGreetingServiceManualyGetTimeService);
 
   Application.MainFormOnTaskbar := True;

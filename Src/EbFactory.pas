@@ -28,12 +28,13 @@ type
   IFactory = interface
     ['{F5603417-3D80-4735-B66D-84FFAC15770B}']
 
-    { This method is called when the framework needs an instance of a given
-      interface. If this factory can handle that interface, then the instance
-      should be put on the "Instance" argument, and this method must return
-      True. If this factory isn't intended for handling the given interface,
-      then this method must return False }
-    function TryBuild(Intf: TGUID; out Instance: IInterface): Boolean;
+    function GetGUID: TGUID;
+
+    property GUID: TGUID read GetGUID;
+
+    { This method is called when the framework needs an instance the interface
+      handled by this factory. }
+    function GetInstance: IInterface;
   end;
 
 implementation

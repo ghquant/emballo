@@ -26,11 +26,12 @@ type
   { A factory that will always return the same instance. Like a singleton }
   TSingletonFactory = class(TInterfacedObject, IFactory)
   private
-    FIntf: TGUID;
+    FGUID: TGUID;
     FInstance: IInterface;
-    function TryBuild(Intf: TGUID; out Instance: IInterface): Boolean;
+    function GetInstance: IInterface;
+    function GetGUID: TGUID;
   public
-    constructor Create(Intf: TGUID; const Instance: IInterface);
+    constructor Create(GUID: TGUID; const Instance: IInterface);
   end;
 
 implementation
@@ -40,18 +41,20 @@ uses
 
 { TSingletonFactory }
 
-constructor TSingletonFactory.Create(Intf: TGUID; const Instance: IInterface);
+constructor TSingletonFactory.Create(GUID: TGUID; const Instance: IInterface);
 begin
-  FIntf := Intf;
+  FGUID := GUID;
   FInstance := Instance;
 end;
 
-function TSingletonFactory.TryBuild(Intf: TGUID;
-  out Instance: IInterface): Boolean;
+function TSingletonFactory.GetGUID: TGUID;
 begin
-  Result := IsEqualGUID(FIntf, Intf);
-  if Result then
-    Instance := FInstance;
+  Result := FGUID;
+end;
+
+function TSingletonFactory.GetInstance: IInterface;
+begin
+  Result := FInstance;
 end;
 
 end.

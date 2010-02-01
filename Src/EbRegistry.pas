@@ -48,7 +48,7 @@ procedure ClearRegistry;
 implementation
 
 uses
-  Generics.Collections, EbDynamicFactory, EbSingletonFactory;
+  Generics.Collections, EbDynamicFactory, EbSingletonFactory, SysUtils;
 
 var
   Factories: TList<IFactory>;
@@ -72,13 +72,15 @@ function TryBuild(GUID: TGUID; out Instance: IInterface): Boolean;
 var
   Factory: IFactory;
 begin
-  Result := False;
   for Factory in Factories do
   begin
-    Result := Factory.TryBuild(GUID, Instance);
-    if Result then
-      Break;
+    if IsEqualGUID(GUID, Factory.GUID) then
+    begin
+      Instance := Factory.GetInstance;
+      Exit(True);
+    end;
   end;
+  Result := False;
 end;
 
 procedure ClearRegistry;
