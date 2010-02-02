@@ -56,8 +56,12 @@ var
 begin
   Ctx := TRttiContext.Create;
   try
-    RttiType := GetRttiTypeFromGUID(Ctx, GUID);
-    InterfaceName := RttiType.Name;
+    try
+      RttiType := GetRttiTypeFromGUID(Ctx, GUID);
+      InterfaceName := RttiType.Name;
+    except
+      on EUnknownGUID do InterfaceName := GUIDToString(GUID);
+    end;
     inherited Create('Could not instantiate ' + InterfaceName);
   finally
     Ctx.Free;
@@ -67,11 +71,9 @@ end;
 { TEmballo }
 
 function TEmballo.Get(GUID: TGUID): IInterface;
-var
-  ServiceGUID: TGUID;
 begin
-  if not TryBuild(ServiceGUID, Result) then
-    raise ECouldNotBuild.Create(ServiceGUID);
+  if not TryBuild(GUID, Result) then
+    raise ECouldNotBuild.Create(GUID);
 end;
 
 function TEmballo.Get<ServiceInterface>: ServiceInterface;
