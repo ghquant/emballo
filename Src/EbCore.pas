@@ -25,7 +25,8 @@ uses
 type
   TEmballo = class
   public
-    function Get<ServiceInterface>: ServiceInterface;
+    function Get<ServiceInterface>: ServiceInterface; overload;
+    function Get(GUID: TGUID): IInterface; overload;
   end;
 
   ECouldNotBuild = class(Exception)
@@ -65,6 +66,14 @@ end;
 
 { TEmballo }
 
+function TEmballo.Get(GUID: TGUID): IInterface;
+var
+  ServiceGUID: TGUID;
+begin
+  if not TryBuild(ServiceGUID, Result) then
+    raise ECouldNotBuild.Create(ServiceGUID);
+end;
+
 function TEmballo.Get<ServiceInterface>: ServiceInterface;
 var
   Service: IInterface;
@@ -79,8 +88,7 @@ begin
       raise EArgumentException.Create('Emballo.Get must be called only with interface types');
 
     ServiceGUID := (ServiceRttiType as TRttiInterfaceType).GUID;
-    if not TryBuild(ServiceGUID, Service) then
-      raise ECouldNotBuild.Create(ServiceGUID);
+    Service := Get(ServiceGUID);
 
     Supports(Service, ServiceGUID, Result);
   finally
