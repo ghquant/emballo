@@ -51,7 +51,9 @@ contains
   EbDynamicFactory in '..\Src\EbDynamicFactory.pas',
   EbRegistry in '..\Src\EbRegistry.pas',
   EbUtil in '..\Src\EbUtil.pas',
-  EbSingletonFactory in '..\Src\EbSingletonFactory.pas',
-  EbAbstractFactory in '..\Src\EbAbstractFactory.pas';
+  EbPreBuiltFactory in '..\Src\EbPreBuiltFactory.pas',
+  EbAbstractFactory in '..\Src\EbAbstractFactory.pas',
+  EbAbstractWrapperFactory in '..\Src\EbAbstractWrapperFactory.pas',
+  EbSingletonFactory in '..\Src\EbSingletonFactory.pas';
 
 end.

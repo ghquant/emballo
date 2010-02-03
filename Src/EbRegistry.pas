@@ -20,15 +20,25 @@ unit EbRegistry;
 interface
 
 uses
-  EbFactory;
+  EbFactory, EbSingletonFactory, EbUtil;
+
+type
+  { The way the framework will manage instances of each interface }
+  TLifeCycleManagement = (lcNone, { No special treatment }
+                          lcSingleton { Instances get cached, so that the
+                                        framework will always return the same
+                                        instance}
+                         , teste);
 
 { Register a generic factory }
-procedure RegisterFactory(const Factory: IFactory); overload;
+procedure RegisterFactory(const Factory: IFactory;
+  LifeCycleManagement: TLifeCycleManagement = lcNone); overload;
 
 { Register a factory that will always return a new instance of the class
   specified by the "Implementor" argument when an instance of interface
   specified by "GUID" parameter is requested }
-procedure RegisterFactory(const GUID: TGUID; Implementor: TClass); overload;
+procedure RegisterFactory(const GUID: TGUID; Implementor: TClass;
+  LifeCycleManagement: TLifeCycleManagement = lcNone); overload;
 
 { Register a factory that will always return the object referenced by the
   "Instance" parameter when an instance of the interface specified by "GUID"
@@ -53,19 +63,29 @@ uses
 var
   Factories: TList<IFactory>;
 
-procedure RegisterFactory(const Factory: IFactory);
+procedure RegisterFactory(const Factory: IFactory;
+  LifeCycleManagement: TLifeCycleManagement);
+var
+  NewFactory: IFactory;
 begin
-  Factories.Add(Factory);
+  case LifeCycleManagement of
+    lcNone: NewFactory := Factory;
+    lcSingleton: NewFactory := TSingletonFactory.Create(Factory);
+    else NotCoveredEnumValue(TypeInfo(TLifeCycleManagement), Ord(LifeCycleManagement));
+  end;
+
+  Factories.Add(NewFactory);
 end;
 
-procedure RegisterFactory(const GUID: TGUID; Implementor: TClass);
+procedure RegisterFactory(const GUID: TGUID; Implementor: TClass;
+  LifeCycleManagement: TLifeCycleManagement);
 begin
-  RegisterFactory(TDynamicFactory.Create(GUID, Implementor));
+  RegisterFactory(TDynamicFactory.Create(GUID, Implementor), LifeCycleManagement);
 end;
 
 procedure RegisterFactory(const GUID: TGUID; const Instance: IInterface); overload;
 begin
-  RegisterFactory(TPreBuiltFactory.Create(GUID, Instance));
+  RegisterFactory(TPreBuiltFactory.Create(GUID, Instance), lcNone);
 end;
 
 function TryBuild(GUID: TGUID; out Instance: IInterface): Boolean;
