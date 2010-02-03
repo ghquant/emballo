@@ -15,7 +15,7 @@
     You should have received a copy of the GNU General Public License
     along with Foobar.  If not, see <http://www.gnu.org/licenses/>. }
 
-unit EbSingletonFactory;
+unit EbPreBuiltFactory;
 
 interface
 
@@ -24,7 +24,7 @@ uses
 
 type
   { A factory that will always return the same instance. Like a singleton }
-  TSingletonFactory = class(TAbstractFactory)
+  TPreBuiltFactory = class(TAbstractFactory)
   private
     FInstance: IInterface;
   protected
@@ -38,15 +38,15 @@ implementation
 uses
   SysUtils;
 
-{ TSingletonFactory }
+{ TPreBuiltFactory }
 
-constructor TSingletonFactory.Create(GUID: TGUID; const Instance: IInterface);
+constructor TPreBuiltFactory.Create(GUID: TGUID; const Instance: IInterface);
 begin
   inherited Create(GUID);
   FInstance := Instance;
 end;
 
-function TSingletonFactory.GetInstance: IInterface;
+function TPreBuiltFactory.GetInstance: IInterface;
 begin
   Result := FInstance;
 end;

@@ -48,7 +48,7 @@ procedure ClearRegistry;
 implementation
 
 uses
-  Generics.Collections, EbDynamicFactory, EbSingletonFactory, SysUtils;
+  Generics.Collections, EbDynamicFactory, EbPreBuiltFactory, SysUtils;
 
 var
   Factories: TList<IFactory>;
@@ -65,7 +65,7 @@ end;
 
 procedure RegisterFactory(const GUID: TGUID; const Instance: IInterface); overload;
 begin
-  RegisterFactory(TSingletonFactory.Create(GUID, Instance));
+  RegisterFactory(TPreBuiltFactory.Create(GUID, Instance));
 end;
 
 function TryBuild(GUID: TGUID; out Instance: IInterface): Boolean;
