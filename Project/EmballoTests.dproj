@@ -55,6 +55,7 @@
 			</DelphiCompile>
 			<DCCReference Include="..\Tests\EbInstantiatorTests.pas"/>
 			<DCCReference Include="..\Tests\EbCoreTests.pas"/>
+			<DCCReference Include="..\Tests\EbPreBuiltFactoryTests.pas"/>
 			<BuildConfiguration Include="Base">
 				<Key>Base</Key>
 			</BuildConfiguration>

@@ -43,6 +43,9 @@ uses
 constructor TPreBuiltFactory.Create(GUID: TGUID; const Instance: IInterface);
 begin
   inherited Create(GUID);
+  if not Assigned(Instance) then
+    raise EArgumentException.Create('TPreBuiltFactory requires a not Nil instance');
+
   FInstance := Instance;
 end;
 

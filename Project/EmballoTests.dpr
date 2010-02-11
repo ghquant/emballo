@@ -37,7 +37,8 @@ uses
   GUITestRunner,
   TextTestRunner,
   EbInstantiatorTests in '..\Tests\EbInstantiatorTests.pas',
-  EbCoreTests in '..\Tests\EbCoreTests.pas';
+  EbCoreTests in '..\Tests\EbCoreTests.pas',
+  EbPreBuiltFactoryTests in '..\Tests\EbPreBuiltFactoryTests.pas';
 
 {$R *.RES}
 
