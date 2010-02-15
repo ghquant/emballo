@@ -30,7 +30,7 @@ type
     function GetGUID: TGUID;
   protected
     FActualFactory: IFactory;
-    function GetDeferredFactory: TDeferredFactory; virtual; abstract;
+    function GetInstance: IInterface; virtual; abstract;
   public
     constructor Create(const ActualFactory: IFactory);
   end;

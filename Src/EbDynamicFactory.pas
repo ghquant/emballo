@@ -20,7 +20,7 @@ unit EbDynamicFactory;
 interface
 
 uses
-  EbFactory, EbAbstractFactory;
+  EbAbstractFactory;
 
 type
   { A factory thet relies on EbInsantiator.TInstantiator to dynamicaly build
@@ -29,7 +29,7 @@ type
   private
     FImplementor: TClass;
   protected
-    function GetDeferredFactory: TDeferredFactory; override;
+    function GetInstance: IInterface; override;
   public
     constructor Create(GUID: TGUID; Implementor: TClass);
   end;
@@ -46,20 +46,17 @@ begin
   FImplementor := Implementor;
 end;
 
-function TDynamicFactory.GetDeferredFactory: TDeferredFactory;
+function TDynamicFactory.GetInstance: IInterface;
+var
+  Inst: TInstantiator;
+  LInstance: TObject;
 begin
-  Result := function: IInterface
-  var
-    Inst: TInstantiator;
-    LInstance: TObject;
-  begin
-    Inst := TInstantiator.Create;
-    try
-      LInstance := Inst.Instantiate(FImplementor);
-      Supports(LInstance, GetGUID, Result);
-    finally
-      Inst.Free;
-    end;
+  Inst := TInstantiator.Create;
+  try
+    LInstance := Inst.Instantiate(FImplementor);
+    Supports(LInstance, GetGUID, Result);
+  finally
+    Inst.Free;
   end;
 end;
 

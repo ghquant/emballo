@@ -46,12 +46,9 @@ type
     constructor Create(const Factory: IFactory);
   end;
 
-{ Tries to get an instance of the interface specified by the "GUID" parameter.
-  if it succeds, the instance is put on the "Instance" parameter, and the
-  function returns True. Otherwise, it returns False.
-  This function tries to get the instance within all of the already registered
-  factories }
-function TryBuild(GUID: TGUID; out DeferredFactory: TDeferredFactory): Boolean;
+{ Returns a registered IFactory that can handle the specified GUID. If none can
+  be found, return Nil. }
+function GetFactoryFor(GUID: TGUID): IFactory;
 
 { Starts the registration of a generic IFactory }
 function RegisterFactory(const Factory: IFactory): IRegister; overload;
@@ -90,19 +87,17 @@ begin
   Result := RegisterFactory(TPreBuiltFactory.Create(GUID, Instance));
 end;
 
-function TryBuild(GUID: TGUID; out DeferredFactory: TDeferredFactory): Boolean;
+function GetFactoryFor(GUID: TGUID): IFactory;
 var
   Factory: IFactory;
 begin
   for Factory in Factories do
   begin
     if IsEqualGUID(GUID, Factory.GUID) then
-    begin
-      DeferredFactory := Factory.GetDeferredFactory;
-      Exit(True);
-    end;
+      Exit(Factory);
   end;
-  Result := False;
+
+  Result := Nil;
 end;
 
 procedure ClearRegistry;

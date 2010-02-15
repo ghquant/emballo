@@ -72,12 +72,13 @@ end;
 
 function TEmballo.Get(GUID: TGUID): IInterface;
 var
-  DeferredFactory: TDeferredFactory;
+  Factory: IFactory;
 begin
-  if not TryBuild(GUID, DeferredFactory) then
+  Factory := GetFactoryFor(GUID);
+  if Assigned(Factory) then
+    Result := Factory.GetInstance
+  else
     raise ECouldNotBuild.Create(GUID);
-
-  Result := DeferredFactory;
 end;
 
 function TEmballo.Get<ServiceInterface>: ServiceInterface;

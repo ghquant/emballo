@@ -29,7 +29,7 @@ type
     FGUID: TGUID;
   protected
     function GetGUID: TGUID;
-    function GetDeferredFactory: TDeferredFactory; virtual; abstract;
+    function GetInstance: IInterface; virtual; abstract;
   public
     constructor Create(GUID: TGUID);
   end;

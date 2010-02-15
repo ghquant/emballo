@@ -153,21 +153,22 @@ function TInstantiator.TryExecuteConstructor(AClass: TClass; Ctor: TRttiMethod;
 var
   Params: TArray<TRttiParameter>;
   Args: TArray<TValue>;
-  DeferredFactories: TArray<TDeferredFactory>;
+  Factories: TArray<IFactory>;
   ParamInstance: IInterface;
   ParamType: TRttiInterfaceType;
   i: Integer;
   GUID: TGUID;
 begin
   Params := Ctor.GetParameters;
-  SetLength(DeferredFactories, Length(Params));
+  SetLength(Factories, Length(Params));
   for i := 0 to High(Params) do
   begin
     if Params[i].ParamType.TypeKind = tkInterface then
     begin
       ParamType := (Params[i].ParamType as TRttiInterfaceType);
       GUID := ParamType.GUID;
-      if not TryBuild(GUID, DeferredFactories[i]) then
+      Factories[i] := GetFactoryFor(GUID);
+      if not Assigned(Factories[i]) then
         Exit(False);
     end
     else
@@ -180,7 +181,7 @@ begin
   SetLength(Args, Length(Params));
   for i := 0 to High(Params) do
   begin
-    ParamInstance := DeferredFactories[i]();
+    ParamInstance := Factories[i].GetInstance;
     TValue.Make(@ParamInstance, GetTypeInfoFromGUID(GUID), Args[i]);
   end;
 

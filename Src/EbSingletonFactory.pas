@@ -20,7 +20,7 @@ unit EbSingletonFactory;
 interface
 
 uses
-  EbAbstractWrapperFactory, EbFactory;
+  EbAbstractWrapperFactory;
 
 type
   { A factory that works on top of another factory. At the time of the first
@@ -30,7 +30,7 @@ type
   private
     FInstance: IInterface;
   protected
-    function GetDeferredFactory: TDeferredFactory; override;
+    function GetInstance: IInterface; override;
   end;
 
 
@@ -38,15 +38,12 @@ implementation
 
 { TSingletonFactory }
 
-function TSingletonFactory.GetDeferredFactory: TDeferredFactory;
+function TSingletonFactory.GetInstance: IInterface;
 begin
-  Result := function: IInterface
-  begin
-    if not Assigned(FInstance) then
-      FInstance := FActualFactory.GetDeferredFactory;
+  if not Assigned(FInstance) then
+    FInstance := FActualFactory.GetInstance;
 
-    Result := FInstance;
-  end;
+  Result := FInstance;
 end;
 
 end.
