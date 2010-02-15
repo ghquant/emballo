@@ -29,7 +29,7 @@ type
   private
     FImplementor: TClass;
   protected
-    function GetInstance: IInterface; override;
+    function GetDeferredFactory: TDeferredFactory; override;
   public
     constructor Create(GUID: TGUID; Implementor: TClass);
   end;
@@ -46,17 +46,20 @@ begin
   FImplementor := Implementor;
 end;
 
-function TDynamicFactory.GetInstance: IInterface;
-var
-  Inst: TInstantiator;
-  LInstance: TObject;
+function TDynamicFactory.GetDeferredFactory: TDeferredFactory;
 begin
-  Inst := TInstantiator.Create;
-  try
-    LInstance := Inst.Instantiate(FImplementor);
-    Supports(LInstance, GetGUID, Result);
-  finally
-    Inst.Free;
+  Result := function: IInterface
+  var
+    Inst: TInstantiator;
+    LInstance: TObject;
+  begin
+    Inst := TInstantiator.Create;
+    try
+      LInstance := Inst.Instantiate(FImplementor);
+      Supports(LInstance, GetGUID, Result);
+    finally
+      Inst.Free;
+    end;
   end;
 end;
 

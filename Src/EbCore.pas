@@ -39,7 +39,7 @@ function Emballo: TEmballo;
 implementation
 
 uses
-  Rtti, EbInstantiator, EbRegistry, EbUtil, TypInfo;
+  Rtti, EbInstantiator, EbRegistry, EbUtil, TypInfo, EbFactory;
 
 function Emballo: TEmballo;
 begin
@@ -71,9 +71,13 @@ end;
 { TEmballo }
 
 function TEmballo.Get(GUID: TGUID): IInterface;
+var
+  DeferredFactory: TDeferredFactory;
 begin
-  if not TryBuild(GUID, Result) then
+  if not TryBuild(GUID, DeferredFactory) then
     raise ECouldNotBuild.Create(GUID);
+
+  Result := DeferredFactory;
 end;
 
 function TEmballo.Get<ServiceInterface>: ServiceInterface;

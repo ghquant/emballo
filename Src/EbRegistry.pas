@@ -50,7 +50,7 @@ procedure RegisterFactory(const GUID: TGUID; const Instance: IInterface); overlo
   function returns True. Otherwise, it returns False.
   This function tries to get the instance within all of the already registered
   factories }
-function TryBuild(GUID: TGUID; out Instance: IInterface): Boolean;
+function TryBuild(GUID: TGUID; out DeferredFactory: TDeferredFactory): Boolean;
 
 { Removes all of the already registered factories }
 procedure ClearRegistry;
@@ -88,7 +88,7 @@ begin
   RegisterFactory(TPreBuiltFactory.Create(GUID, Instance), lcNone);
 end;
 
-function TryBuild(GUID: TGUID; out Instance: IInterface): Boolean;
+function TryBuild(GUID: TGUID; out DeferredFactory: TDeferredFactory): Boolean;
 var
   Factory: IFactory;
 begin
@@ -96,7 +96,7 @@ begin
   begin
     if IsEqualGUID(GUID, Factory.GUID) then
     begin
-      Instance := Factory.GetInstance;
+      DeferredFactory := Factory.GetDeferredFactory;
       Exit(True);
     end;
   end;

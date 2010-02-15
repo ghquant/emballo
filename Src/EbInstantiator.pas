@@ -90,7 +90,7 @@ type
 implementation
 
 uses
-  EbRegistry, EbUtil;
+  EbRegistry, EbUtil, EbFactory;
 
 { TInstantiator }
 
@@ -153,27 +153,37 @@ function TInstantiator.TryExecuteConstructor(AClass: TClass; Ctor: TRttiMethod;
 var
   Params: TArray<TRttiParameter>;
   Args: TArray<TValue>;
+  DeferredFactories: TArray<TDeferredFactory>;
   ParamInstance: IInterface;
   ParamType: TRttiInterfaceType;
   i: Integer;
   GUID: TGUID;
 begin
   Params := Ctor.GetParameters;
-  SetLength(Args, Length(Params));
-  for i := 0 to High(Args) do
+  SetLength(DeferredFactories, Length(Params));
+  for i := 0 to High(Params) do
   begin
     if Params[i].ParamType.TypeKind = tkInterface then
     begin
       ParamType := (Params[i].ParamType as TRttiInterfaceType);
       GUID := ParamType.GUID;
-      if not TryBuild(GUID, ParamInstance) then
+      if not TryBuild(GUID, DeferredFactories[i]) then
         Exit(False);
-
-      TValue.Make(@ParamInstance, GetTypeInfoFromGUID(GUID), Args[i]);
     end
     else
       Exit(False);
   end;
+
+  { If we are here, then all parameters are interface types, and we managed to
+    get the deferred factories for all of the parameters. Then we can invoke the
+    factories to get the actual instances for the parameters }
+  SetLength(Args, Length(Params));
+  for i := 0 to High(Params) do
+  begin
+    ParamInstance := DeferredFactories[i]();
+    TValue.Make(@ParamInstance, GetTypeInfoFromGUID(GUID), Args[i]);
+  end;
+
   Instance := Ctor.Invoke(AClass, Args).AsObject;
   Result := True;
 end;

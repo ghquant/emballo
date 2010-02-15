@@ -20,7 +20,7 @@ unit EbPreBuiltFactory;
 interface
 
 uses
-  EbAbstractFactory;
+  EbAbstractFactory, EbFactory;
 
 type
   { A factory that will always return the same instance. Like a singleton }
@@ -28,7 +28,7 @@ type
   private
     FInstance: IInterface;
   protected
-    function GetInstance: IInterface; override;
+    function GetDeferredFactory: TDeferredFactory; override;
   public
     constructor Create(GUID: TGUID; const Instance: IInterface);
   end;
@@ -49,9 +49,12 @@ begin
   FInstance := Instance;
 end;
 
-function TPreBuiltFactory.GetInstance: IInterface;
+function TPreBuiltFactory.GetDeferredFactory: TDeferredFactory;
 begin
-  Result := FInstance;
+  Result := function: IInterface
+  begin
+    Result := FInstance;
+  end;
 end;
 
 end.
