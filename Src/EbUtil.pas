@@ -28,19 +28,12 @@ type
     constructor Create(GUID: TGUID);
   end;
 
-  ENotCoveredEnumValue = class(Exception)
-  public
-    constructor Create(EnumTypeInfo: PTypeInfo; EnumValue: Integer);
-  end;
-
 { Returns the typeinfo of an interface given it's GUID.
   The interface is searched using Rtti, and if no interface with the given GUID
   can be found, an EUnknownGUID is raised }
 function GetTypeInfoFromGUID(GUID: TGUID): PTypeInfo;
 
 function GetRttiTypeFromGUID(Ctx: TRttiContext; GUID: TGUID): TRttiInterfaceType;
-
-procedure NotCoveredEnumValue(EnumTypeInfo: PTypeInfo; EnumValue: Integer);
 
 implementation
 
@@ -80,22 +73,6 @@ end;
 constructor EUnknownGUID.Create(GUID: TGUID);
 begin
   inherited Create('GUID not found: ' + GUIDToString(GUID));
-end;
-
-{ ENotCoveredEnumValue }
-
-constructor ENotCoveredEnumValue.Create(EnumTypeInfo: PTypeInfo;
-  EnumValue: Integer);
-var
-  EnumName: String;
-begin
-  EnumName := GetEnumName(EnumTypeInfo, EnumValue);
-  inherited CreateFmt('Forgot to add support to enum value %s somewhere', [EnumName]);
-end;
-
-procedure NotCoveredEnumValue(EnumTypeInfo: PTypeInfo; EnumValue: Integer);
-begin
-  raise ENotCoveredEnumValue.Create(EnumTypeInfo, EnumValue);
 end;
 
 end.

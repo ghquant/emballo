@@ -18,11 +18,6 @@
 program Demo;
 
 uses
-  madExcept,
-  madLinkDisAsm,
-  madListHardware,
-  madListProcesses,
-  madListModules,
   Forms,
   EbRegistry,
   UFrmMain in '..\Src\UFrmMain.pas' {FrmMain},
@@ -35,14 +30,14 @@ uses
 
 begin
   Application.Initialize;
-  RegisterFactory(ITimeService, TTimeService);
+  RegisterFactory(ITimeService, TTimeService).Done;
 
   { *************************************************************************
     * Each of these two IGreetingService implementation show a different    *
-    * way for getting the ITimeService instance. Choose one                 *
+    * way for getting the ITimeService instance. Choose one.                *
     ************************************************************************* }
-  RegisterFactory(IGreetingService, TGreetingServiceWithConstructorInjection);
-//  RegisterFactory(IGreetingService, TGreetingServiceManualyGetTimeService);
+  RegisterFactory(IGreetingService, TGreetingServiceWithConstructorInjection).Done;
+//  RegisterFactory(IGreetingService, TGreetingServiceManualyGetTimeService).Done;
 
   Application.MainFormOnTaskbar := True;
   Application.CreateForm(TFrmMain, FrmMain);

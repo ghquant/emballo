@@ -23,27 +23,28 @@ uses
   EbFactory, EbSingletonFactory, EbUtil;
 
 type
-  { The way the framework will manage instances of each interface }
-  TLifeCycleManagement = (lcNone, { No special treatment }
-                          lcSingleton { Instances get cached, so that the
-                                        framework will always return the same
-                                        instance}
-                         , teste);
+  { This interface handles the registration of a factory within the framework.
+    Before registering the factory, it can decorate the base factory in
+    different ways, for exemple to work as a singleton }
+  IRegister = interface
+    ['{0A2FD56B-0A72-4DA4-8454-A526DDD04B80}']
 
-{ Register a generic factory }
-procedure RegisterFactory(const Factory: IFactory;
-  LifeCycleManagement: TLifeCycleManagement = lcNone); overload;
+    { Decorates the factory to work as a singleton. That is, after getting the
+      instance for the first time, it will be cached }
+    function Singleton: IRegister;
 
-{ Register a factory that will always return a new instance of the class
-  specified by the "Implementor" argument when an instance of interface
-  specified by "GUID" parameter is requested }
-procedure RegisterFactory(const GUID: TGUID; Implementor: TClass;
-  LifeCycleManagement: TLifeCycleManagement = lcNone); overload;
+    { Do the registration }
+    procedure Done;
+  end;
 
-{ Register a factory that will always return the object referenced by the
-  "Instance" parameter when an instance of the interface specified by "GUID"
-  parameter is requested }
-procedure RegisterFactory(const GUID: TGUID; const Instance: IInterface); overload;
+  TRegister = class(TInterfacedObject, IRegister)
+  private
+    FFactory: IFactory;
+    function Singleton: IRegister;
+    procedure Done;
+  public
+    constructor Create(const Factory: IFactory);
+  end;
 
 { Tries to get an instance of the interface specified by the "GUID" parameter.
   if it succeds, the instance is put on the "Instance" parameter, and the
@@ -51,6 +52,17 @@ procedure RegisterFactory(const GUID: TGUID; const Instance: IInterface); overlo
   This function tries to get the instance within all of the already registered
   factories }
 function TryBuild(GUID: TGUID; out DeferredFactory: TDeferredFactory): Boolean;
+
+{ Starts the registration of a generic IFactory }
+function RegisterFactory(const Factory: IFactory): IRegister; overload;
+
+{ Start the registration of a factory that will dynamically build an instance
+  given its metaclass }
+function RegisterFactory(const GUID: TGUID; Implementor: TClass): IRegister; overload;
+
+{ Starts the registration of a factory that will always return a pre defined
+  instance }
+function RegisterFactory(const GUID: TGUID; const Instance: IInterface): IRegister; overload;
 
 { Removes all of the already registered factories }
 procedure ClearRegistry;
@@ -63,29 +75,19 @@ uses
 var
   Factories: TList<IFactory>;
 
-procedure RegisterFactory(const Factory: IFactory;
-  LifeCycleManagement: TLifeCycleManagement);
-var
-  NewFactory: IFactory;
+function RegisterFactory(const Factory: IFactory): IRegister;
 begin
-  case LifeCycleManagement of
-    lcNone: NewFactory := Factory;
-    lcSingleton: NewFactory := TSingletonFactory.Create(Factory);
-    else NotCoveredEnumValue(TypeInfo(TLifeCycleManagement), Ord(LifeCycleManagement));
-  end;
-
-  Factories.Add(NewFactory);
+  Result := TRegister.Create(Factory);
 end;
 
-procedure RegisterFactory(const GUID: TGUID; Implementor: TClass;
-  LifeCycleManagement: TLifeCycleManagement);
+function RegisterFactory(const GUID: TGUID; Implementor: TClass): IRegister;
 begin
-  RegisterFactory(TDynamicFactory.Create(GUID, Implementor), LifeCycleManagement);
+  Result := RegisterFactory(TDynamicFactory.Create(GUID, Implementor));
 end;
 
-procedure RegisterFactory(const GUID: TGUID; const Instance: IInterface); overload;
+function RegisterFactory(const GUID: TGUID; const Instance: IInterface): IRegister;
 begin
-  RegisterFactory(TPreBuiltFactory.Create(GUID, Instance), lcNone);
+  Result := RegisterFactory(TPreBuiltFactory.Create(GUID, Instance));
 end;
 
 function TryBuild(GUID: TGUID; out DeferredFactory: TDeferredFactory): Boolean;
@@ -106,6 +108,24 @@ end;
 procedure ClearRegistry;
 begin
   Factories.Clear;
+end;
+
+{ TRegister }
+
+constructor TRegister.Create(const Factory: IFactory);
+begin
+  FFactory := Factory;
+end;
+
+procedure TRegister.Done;
+begin
+  Factories.Add(FFactory);
+end;
+
+function TRegister.Singleton: IRegister;
+begin
+  FFactory := TSingletonFactory.Create(FFactory);
+  Result := Self;
 end;
 
 initialization
