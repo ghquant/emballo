@@ -95,7 +95,7 @@ var
 
 
 begin
-  { Stub generated stub would be like:
+  { Generated stub would be like:
     function GeneratedStub(Self: TObject): Integer; stdcall;
     begin
       Result := <this TPoolFactory instance>.HackedRelease(Self);
@@ -113,7 +113,7 @@ begin
     our HackedRelease method }
   Put($B8); Put(Integer(Self));
 
-  { call <offset to TPoolFactory.HackedRelease
+  { call <offset to TPoolFactory.HackedRelease>
     Now it's OK to call our TPoolFactory.HackedRelease method }
   Put($E8); Put(Integer(@TPoolFactory.HackedRelease) - Integer(FReleaseStub) - Counter - 4);
 

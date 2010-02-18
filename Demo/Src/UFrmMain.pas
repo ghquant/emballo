@@ -35,7 +35,7 @@ var
 implementation
 
 uses
-  UGreetingService;
+  UGreetingService, EbCore;
 
 {$R *.dfm}
 
