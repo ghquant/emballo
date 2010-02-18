@@ -18,6 +18,11 @@
 program Demo;
 
 uses
+  madExcept,
+  madLinkDisAsm,
+  madListHardware,
+  madListProcesses,
+  madListModules,
   Forms,
   EbRegistry,
   UFrmMain in '..\Src\UFrmMain.pas' {FrmMain},
@@ -30,6 +35,7 @@ uses
 
 begin
   Application.Initialize;
+  ReportMemoryLeaksOnShutdown := True;
   RegisterFactory(ITimeService, TTimeService).Done;
 
   { *************************************************************************

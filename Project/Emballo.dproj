@@ -66,6 +66,7 @@
 			<DCCReference Include="..\Src\EbAbstractFactory.pas"/>
 			<DCCReference Include="..\Src\EbAbstractWrapperFactory.pas"/>
 			<DCCReference Include="..\Src\EbSingletonFactory.pas"/>
+			<DCCReference Include="..\Src\EbPoolFactory.pas"/>
 			<BuildConfiguration Include="Base">
 				<Key>Base</Key>
 			</BuildConfiguration>

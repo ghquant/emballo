@@ -54,6 +54,7 @@ contains
   EbPreBuiltFactory in '..\Src\EbPreBuiltFactory.pas',
   EbAbstractFactory in '..\Src\EbAbstractFactory.pas',
   EbAbstractWrapperFactory in '..\Src\EbAbstractWrapperFactory.pas',
-  EbSingletonFactory in '..\Src\EbSingletonFactory.pas';
+  EbSingletonFactory in '..\Src\EbSingletonFactory.pas',
+  EbPoolFactory in '..\Src\EbPoolFactory.pas';
 
 end.
