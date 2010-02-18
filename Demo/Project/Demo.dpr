@@ -18,11 +18,6 @@
 program Demo;
 
 uses
-  madExcept,
-  madLinkDisAsm,
-  madListHardware,
-  madListProcesses,
-  madListModules,
   Forms,
   EbRegistry,
   UFrmMain in '..\Src\UFrmMain.pas' {FrmMain},

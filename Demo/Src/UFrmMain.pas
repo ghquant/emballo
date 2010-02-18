@@ -35,42 +35,16 @@ var
 implementation
 
 uses
-  UGreetingService, EbCore;
-
-type
-  ITeste = interface
-    ['{A6189EC3-2E95-4CE5-AF7C-D867967F40DE}']
-  end;
-
-  TTeste = class(TInterfacedObject, ITeste)
-
-  end;
+  UGreetingService;
 
 {$R *.dfm}
 
 procedure TFrmMain.Button1Click(Sender: TObject);
 var
   GreetingService: IGreetingService;
-  T1, T2, T3, T4, T5, T6: ITeste;
 begin
-  T1 := Emballo.Get<ITeste>;
-  T2 := Emballo.Get<ITeste>;
-  T3 := Emballo.Get<ITeste>;
-  T4 := Emballo.Get<ITeste>;
-  T5 := Emballo.Get<ITeste>;
-  T6 := Emballo.Get<ITeste>;
-  T6 := Nil;
-  T5 := Nil;
-  T4 := Nil;
-  T3 := Nil;
-  T2 := Nil;
-  T1 := Nil;
-  T1 := Emballo.Get<ITeste>;
   GreetingService := Emballo.Get<IGreetingService>;
   ShowMessage(GreetingService.Greeting);
 end;
-
-initialization
-RegisterFactory(ITeste, TTeste).Pool(0, 5).Done;
 
 end.

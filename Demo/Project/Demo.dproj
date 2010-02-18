@@ -44,7 +44,7 @@
 		<PropertyGroup Condition="'$(Cfg_2)'!=''">
 			<DCC_MapFile>3</DCC_MapFile>
 			<DCC_ExeOutput>..\Out\Debug</DCC_ExeOutput>
-			<DCC_Define>DEBUG;madExcept;$(DCC_Define)</DCC_Define>
+			<DCC_Define>DEBUG;$(DCC_Define)</DCC_Define>
 			<DCC_DcuOutput>..\DCU\Debug</DCC_DcuOutput>
 			<DCC_DependencyCheckOutputName>..\Out\Debug\Demo.exe</DCC_DependencyCheckOutputName>
 		</PropertyGroup>

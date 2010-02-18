@@ -47,7 +47,7 @@ type
 implementation
 
 uses
-  Windows, SysUtils, dialogs;
+  Windows, SysUtils;
 
 type
   TArrayOfPointer = array[0..(MAXINT div SizeOf(Pointer)) - 1] of Pointer;
