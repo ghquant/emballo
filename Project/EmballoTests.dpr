@@ -38,7 +38,9 @@ uses
   TextTestRunner,
   EbInstantiatorTests in '..\Tests\EbInstantiatorTests.pas',
   EbCoreTests in '..\Tests\EbCoreTests.pas',
-  EbPreBuiltFactoryTests in '..\Tests\EbPreBuiltFactoryTests.pas';
+  EbPreBuiltFactoryTests in '..\Tests\EbPreBuiltFactoryTests.pas',
+  EbPoolFactoryTests in '..\Tests\EbPoolFactoryTests.pas',
+  EbDelegateFactory in '..\Tests\EbDelegateFactory.pas';
 
 {$R *.RES}
 
