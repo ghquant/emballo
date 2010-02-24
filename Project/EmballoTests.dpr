@@ -40,7 +40,9 @@ uses
   EbCoreTests in '..\Tests\EbCoreTests.pas',
   EbPreBuiltFactoryTests in '..\Tests\EbPreBuiltFactoryTests.pas',
   EbPoolFactoryTests in '..\Tests\EbPoolFactoryTests.pas',
-  EbDelegateFactory in '..\Tests\EbDelegateFactory.pas';
+  EbDelegateFactory in '..\Tests\EbDelegateFactory.pas',
+  EbRegisterImplTests in '..\Tests\EbRegisterImplTests.pas',
+  EbStubFactory in '..\Tests\EbStubFactory.pas';
 
 {$R *.RES}
 

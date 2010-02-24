@@ -20,42 +20,7 @@ unit EbRegistry;
 interface
 
 uses
-  EbFactory, EbSingletonFactory, EbUtil;
-
-type
-  { This interface handles the registration of a factory within the framework.
-    Before registering the factory, it can decorate the base factory in
-    different ways, for exemple to work as a singleton }
-  IRegister = interface
-    ['{0A2FD56B-0A72-4DA4-8454-A526DDD04B80}']
-
-    { Decorates the factory to work as a singleton. That is, after getting the
-      instance for the first time, it will be cached }
-    function Singleton: IRegister;
-
-    { Decorates the factory to work with a pool. That is, when an interface
-      isn't used anyware (in other words, ref. count reaches zero) it is stored
-      in a pool instead of being freed. The next time an interface is needed,
-      it will be obtained from the pool. The max parameter specifies the maximum
-      quantity of objects that can be stored on the pool. Unused interfaces will
-      be automatically freed when ref. count reaches zero if the pool is full.
-      This is useful for objects that are expensive to instantiate, like
-      database connections }
-    function Pool(Max: Integer): IRegister;
-
-    { Do the registration }
-    procedure Done;
-  end;
-
-  TRegister = class(TInterfacedObject, IRegister)
-  private
-    FFactory: IFactory;
-    function Singleton: IRegister;
-    function Pool(Max: Integer): IRegister;
-    procedure Done;
-  public
-    constructor Create(const Factory: IFactory);
-  end;
+  EbFactory, EbRegister, EbRegisterImpl, EbUtil;
 
 { Returns a registered IFactory that can handle the specified GUID. If none can
   be found, return Nil. }
@@ -82,11 +47,11 @@ uses
   EbPoolFactory;
 
 var
-  Factories: TList<IFactory>;
+  Registry: TList<IFactory>;
 
 function RegisterFactory(const Factory: IFactory): IRegister;
 begin
-  Result := TRegister.Create(Factory);
+  Result := TRegister.Create(Factory, Registry);
 end;
 
 function RegisterFactory(const GUID: TGUID; Implementor: TClass): IRegister;
@@ -103,7 +68,7 @@ function GetFactoryFor(GUID: TGUID): IFactory;
 var
   Factory: IFactory;
 begin
-  for Factory in Factories do
+  for Factory in Registry do
   begin
     if IsEqualGUID(GUID, Factory.GUID) then
       Exit(Factory);
@@ -114,37 +79,13 @@ end;
 
 procedure ClearRegistry;
 begin
-  Factories.Clear;
-end;
-
-{ TRegister }
-
-constructor TRegister.Create(const Factory: IFactory);
-begin
-  FFactory := Factory;
-end;
-
-procedure TRegister.Done;
-begin
-  Factories.Add(FFactory);
-end;
-
-function TRegister.Pool(Max: Integer): IRegister;
-begin
-  FFactory := TPoolFactory.Create(FFactory, Max);
-  Result := Self;
-end;
-
-function TRegister.Singleton: IRegister;
-begin
-  FFactory := TSingletonFactory.Create(FFactory);
-  Result := Self;
+  Registry.Clear;
 end;
 
 initialization
-Factories := TList<IFactory>.Create;
+Registry := TList<IFactory>.Create;
 
 finalization
-Factories.Free;
+Registry.Free;
 
 end.

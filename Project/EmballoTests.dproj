@@ -59,6 +59,8 @@
 			<DCCReference Include="..\Tests\EbPreBuiltFactoryTests.pas"/>
 			<DCCReference Include="..\Tests\EbPoolFactoryTests.pas"/>
 			<DCCReference Include="..\Tests\EbDelegateFactory.pas"/>
+			<DCCReference Include="..\Tests\EbRegisterImplTests.pas"/>
+			<DCCReference Include="..\Tests\EbStubFactory.pas"/>
 			<BuildConfiguration Include="Base">
 				<Key>Base</Key>
 			</BuildConfiguration>
