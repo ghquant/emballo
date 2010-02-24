@@ -82,11 +82,15 @@ type
   PArrayOfPointer = ^TArrayOfPointer;
   PPArrayOfPointer = ^PArrayOfPointer;
 
+const
+  RELEASE_INDEX = 2;
+
 { TPoolFactory }
 
 constructor TPoolFactory.Create(const ActualFactory: IFactory; Max: Integer);
 begin
   inherited Create(ActualFactory);
+  FStubPatches := TList<TStubPatch>.Create;
   FMax := Max;
   FPool := TInterfaceList.Create;
   FUnavailable := TList.Create; { It MUST be a list of raw pointers because we
@@ -109,6 +113,9 @@ begin
       StubPatch.Free;
     end;
   end;
+  FStubPatches.Free;
+
+  FPool := Nil;
   inherited;
 end;
 
@@ -117,13 +124,18 @@ begin
   if FPool.Count > 0 then
   begin
     Result := FPool[0];
+    { Add the object on FUnavailable and AddRef it must be done before removing
+      from FPool. Otherwise, refcount would reach one }
+    FUnavailable.Add(Pointer(Result));
+    Result._AddRef;
     FPool.Delete(0);
   end
   else
+  begin
     Result := FActualFactory.GetInstance;
-
-  FUnavailable.Add(Pointer(Result));
-  Result._AddRef;
+    FUnavailable.Add(Pointer(Result));
+    Result._AddRef;
+  end;
 
   PatchInterfaceIdNeeded(Pointer(Result));
 end;
@@ -155,7 +167,7 @@ begin
       FPool.Add(Intf2);
       Intf2 := Nil;
       FUnavailable.Remove(Obj);
-      { As we removed from the pool, now decrease the ref. count }
+      { As we removed from FUnavailable, now decrease the ref. count }
       OriginalRelease;
     end
     else
@@ -168,29 +180,51 @@ begin
 end;
 
 procedure TPoolFactory.PatchInterfaceIdNeeded(Intf: Pointer);
-const
-  RELEASE_INDEX = 2;
+
+  procedure PatchInterfaceTableForClass(AClass: TClass);
+  var
+    i: Integer;
+    InterfaceTable: PInterfaceTable;
+    InterfaceEntry: TInterfaceEntry;
+    Stub: PStub;
+    JmpOffset: PInteger;
+    StubPatch: TStubPatch;
+  begin
+    InterfaceTable := AClass.GetInterfaceTable;
+
+    for i := 0 to InterfaceTable.EntryCount - 1 do
+    begin
+      InterfaceEntry := InterfaceTable.Entries[i];
+
+      Stub := PArrayOfPointer(InterfaceEntry.VTable)^[RELEASE_INDEX];
+
+      JmpOffset := PInteger(Integer(Stub) + 6);
+
+      FOriginalRelease := Pointer(Integer(Stub) + JmpOffset^ + 10);
+
+      StubPatch := TStubPatch.Create(Stub);
+      StubPatch.Patch(HackedRelease);
+      FStubPatches.Add(StubPatch);
+    end;
+  end;
+
 var
-  M: PArrayOfPointer;
-  Stub: PStub;
-  JmpOffset: Integer;
-  StubPatch: TStubPatch;
+  ImplementingObject: TObject;
+  AClass: TClass;
 begin
   if FPatchedInterface then
     Exit;
 
   FPatchedInterface := True;
 
-  M := PPArrayOfPointer(Intf)^;
-  Stub := PStub(M^[RELEASE_INDEX]);
-  Move(Stub^[6], JmpOffset, SizeOf(Integer));
-  FOriginalRelease := Pointer(Integer(Stub) + 10 + JmpOffset);
-  FStubPatches := Generics.Collections.TList<TStubPatch>.Create;
+  ImplementingObject := TObject(IInterface(Intf));
 
-  FStubPatches.Add(TStubPatch.Create(Stub));
+  AClass := ImplementingObject.ClassType;
 
-  for StubPatch in FStubPatches do
-    StubPatch.Patch(HackedRelease);
+  repeat
+    PatchInterfaceTableForClass(AClass);
+    AClass := AClass.ClassParent;
+  until AClass = TObject;
 end;
 
 { TStubPatch }
@@ -222,13 +256,13 @@ var
 var
   M: TMethod;
 begin
-  M := TMethod(HackedRelease);
-
   { Generated stub is going to be like:
     function GeneratedStub(Self: TObject): Integer; stdcall;
     begin
       Result := HackedRelease(Self);
     end;}
+
+  M := TMethod(HackedRelease);
 
   GetMem(FGeneraedStub, 17);
   Counter := 0;

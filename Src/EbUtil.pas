@@ -35,6 +35,8 @@ function GetTypeInfoFromGUID(GUID: TGUID): PTypeInfo;
 
 function GetRttiTypeFromGUID(Ctx: TRttiContext; GUID: TGUID): TRttiInterfaceType;
 
+function GetImplementingObject(const I: IInterface): TObject;
+
 implementation
 
 function GetRttiTypeFromGUID(Ctx: TRttiContext; GUID: TGUID): TRttiInterfaceType;
@@ -66,6 +68,40 @@ begin
   finally
     Ctx.Free;
   end;
+end;
+
+function GetImplementingObject(const I: IInterface): TObject;
+const
+  AddByte = $04244483;
+  AddLong = $04244481;
+type
+  PAdjustSelfThunk = ^TAdjustSelfThunk;
+  TAdjustSelfThunk = packed record
+    case AddInstruction: longint of
+      AddByte : (AdjustmentByte: shortint);
+      AddLong : (AdjustmentLong: longint);
+    end;
+  PInterfaceMT = ^TInterfaceMT;
+  TInterfaceMT = packed record
+    QueryInterfaceThunk: PAdjustSelfThunk;
+  end;
+  TInterfaceRef = ^PInterfaceMT;
+var
+  QueryInterfaceThunk: PAdjustSelfThunk;
+begin
+  Result := Pointer(I);
+  if Assigned(Result) then
+    try
+      QueryInterfaceThunk := TInterfaceRef(I)^.QueryInterfaceThunk;
+      case QueryInterfaceThunk.AddInstruction of
+        AddByte: Inc(PChar(Result), QueryInterfaceThunk.AdjustmentByte);
+        AddLong: Inc(PChar(Result), QueryInterfaceThunk.AdjustmentLong);
+      else
+        Result := nil;
+      end;
+    except
+      Result := nil;
+    end;
 end;
 
 { EUnknownGUID }
