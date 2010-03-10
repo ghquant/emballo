@@ -45,7 +45,7 @@ type
 implementation
 
 uses
-  DateUtils, EbCore;
+  DateUtils, Emballo.DI.Core;
 
 { TGreetingServiceWithConstructorInjection }
 
@@ -74,7 +74,7 @@ var
   Hour: Word;
   TimeService: ITimeService;
 begin
-  TimeService := Emballo.Get<ITimeService>;
+  TimeService := Emballo.DI.Core.Emballo.Get<ITimeService>;
   Hour := HourOf(TimeService.Now);
   if Hour in [6..11] then
     Result := 'Good morning'

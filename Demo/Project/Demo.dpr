@@ -20,7 +20,7 @@ program Demo;
 
 uses
   Forms,
-  EbRegistry,
+  Emballo.DI.Registry,
   UFrmMain in '..\Src\UFrmMain.pas' {FrmMain},
   UTimeService in '..\Src\UTimeService.pas',
   UTimeSerivceImpl in '..\Src\UTimeSerivceImpl.pas',

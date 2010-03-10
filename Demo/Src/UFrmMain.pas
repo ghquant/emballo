@@ -22,7 +22,7 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, StdCtrls, ebregistry, ebdynamicfactory, ebpoolfactory;
+  Dialogs, StdCtrls;
 
 type
   TFrmMain = class(TForm)
@@ -36,7 +36,7 @@ var
 implementation
 
 uses
-  UGreetingService, EbCore;
+  UGreetingService, Emballo.DI.Core;
 
 {$R *.dfm}
 
@@ -44,7 +44,7 @@ procedure TFrmMain.Button1Click(Sender: TObject);
 var
   GreetingService: IGreetingService;
 begin
-  GreetingService := Emballo.Get<IGreetingService>;
+  GreetingService := Emballo.DI.Core.Emballo.Get<IGreetingService>;
   ShowMessage(GreetingService.Greeting);
 end;
 
