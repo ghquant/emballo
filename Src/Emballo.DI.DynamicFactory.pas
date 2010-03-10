@@ -16,43 +16,49 @@
     License along with Emballo.
     If not, see <http://www.gnu.org/licenses/>. }
 
-unit EbPreBuiltFactory;
+unit Emballo.DI.DynamicFactory;
 
 interface
 
 uses
-  EbAbstractFactory;
+  Emballo.DI.AbstractFactory;
 
 type
-  { A factory that will always return the same instance. Like a singleton }
-  TPreBuiltFactory = class(TAbstractFactory)
+  { A factory thet relies on EbInsantiator.TInstantiator to dynamicaly build
+    the instances }
+  TDynamicFactory = class(TAbstractFactory)
   private
-    FInstance: IInterface;
+    FImplementor: TClass;
   protected
     function GetInstance: IInterface; override;
   public
-    constructor Create(GUID: TGUID; const Instance: IInterface);
+    constructor Create(GUID: TGUID; Implementor: TClass);
   end;
 
 implementation
 
-uses
-  SysUtils;
+uses Emballo.DI.Instantiator, SysUtils;
 
-{ TPreBuiltFactory }
+{ TDynamicFactory }
 
-constructor TPreBuiltFactory.Create(GUID: TGUID; const Instance: IInterface);
+constructor TDynamicFactory.Create(GUID: TGUID; Implementor: TClass);
 begin
   inherited Create(GUID);
-  if not Assigned(Instance) then
-    raise EArgumentException.Create('TPreBuiltFactory requires a not Nil instance');
-
-  FInstance := Instance;
+  FImplementor := Implementor;
 end;
 
-function TPreBuiltFactory.GetInstance: IInterface;
+function TDynamicFactory.GetInstance: IInterface;
+var
+  Inst: TInstantiator;
+  LInstance: TObject;
 begin
-  Result := FInstance;
+  Inst := TInstantiator.Create;
+  try
+    LInstance := Inst.Instantiate(FImplementor);
+    Supports(LInstance, GetGUID, Result);
+  finally
+    Inst.Free;
+  end;
 end;
 
 end.

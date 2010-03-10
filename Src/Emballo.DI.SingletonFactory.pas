@@ -16,41 +16,35 @@
     License along with Emballo.
     If not, see <http://www.gnu.org/licenses/>. }
 
-unit EbDelegateFactory;
+unit Emballo.DI.SingletonFactory;
 
 interface
 
 uses
-  EbAbstractFactory;
+  Emballo.DI.AbstractWrapperFactory;
 
 type
-  TGetInstance = reference to function: IInterface;
-
-  IDelegateFactory = interface
-    ['{997E1AFD-9B52-4BF4-85DC-F2A5E8CA693D}']
-    procedure SetGetInstance(Value: TGetInstance);
-  end;
-
-  TDelegateFactory = class(TAbstractFactory, IDelegateFactory)
+  { A factory that works on top of another factory. At the time of the first
+    call to GetInstance, it will use the base factory to get the result and will
+    cache it. On later calls, it will always return the cached result }
+  TSingletonFactory = class(TAbstractWrapperFactory)
   private
-    FGetInstance: TGetInstance;
-    procedure SetGetInstance(Value: TGetInstance);
+    FInstance: IInterface;
   protected
     function GetInstance: IInterface; override;
   end;
 
+
 implementation
 
-{ TDelegateFactory }
+{ TSingletonFactory }
 
-function TDelegateFactory.GetInstance: IInterface;
+function TSingletonFactory.GetInstance: IInterface;
 begin
-  Result := FGetInstance;
-end;
+  if not Assigned(FInstance) then
+    FInstance := FActualFactory.GetInstance;
 
-procedure TDelegateFactory.SetGetInstance(Value: TGetInstance);
-begin
-  FGetInstance := Value;
+  Result := FInstance;
 end;
 
 end.

@@ -16,54 +16,43 @@
     License along with Emballo.
     If not, see <http://www.gnu.org/licenses/>. }
 
-unit EbRegisterImpl;
+unit Emballo.DI.PreBuiltFactory;
 
 interface
 
 uses
-  EbRegister, EbFactory, Generics.Collections;
+  Emballo.DI.AbstractFactory;
 
 type
-  TRegister = class(TInterfacedObject, IRegister)
+  { A factory that will always return the same instance. Like a singleton }
+  TPreBuiltFactory = class(TAbstractFactory)
   private
-    FFactory: IFactory;
-    FRegistry: TList<IFactory>;
-    function Singleton: IRegister;
-    function Pool(Max: Integer): IRegister;
-    procedure Done;
+    FInstance: IInterface;
+  protected
+    function GetInstance: IInterface; override;
   public
-    constructor Create(const Factory: IFactory; const Registry: TList<IFactory>);
+    constructor Create(GUID: TGUID; const Instance: IInterface);
   end;
 
 implementation
 
 uses
-  EbSingletonFactory, EbPoolFactory;
+  SysUtils;
 
-{ TRegister }
+{ TPreBuiltFactory }
 
-constructor TRegister.Create(const Factory: IFactory;
-  const Registry: TList<IFactory>);
+constructor TPreBuiltFactory.Create(GUID: TGUID; const Instance: IInterface);
 begin
-  FFactory := Factory;
-  FRegistry := Registry;
+  inherited Create(GUID);
+  if not Assigned(Instance) then
+    raise EArgumentException.Create('TPreBuiltFactory requires a not Nil instance');
+
+  FInstance := Instance;
 end;
 
-procedure TRegister.Done;
+function TPreBuiltFactory.GetInstance: IInterface;
 begin
-  FRegistry.Add(FFactory);
-end;
-
-function TRegister.Pool(Max: Integer): IRegister;
-begin
-  FFactory := TPoolFactory.Create(FFactory, Max);
-  Result := Self;
-end;
-
-function TRegister.Singleton: IRegister;
-begin
-  FFactory := TSingletonFactory.Create(FFactory);
-  Result := Self;
+  Result := FInstance;
 end;
 
 end.

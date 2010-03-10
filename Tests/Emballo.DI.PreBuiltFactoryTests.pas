@@ -16,32 +16,39 @@
     License along with Emballo.
     If not, see <http://www.gnu.org/licenses/>. }
 
-unit EbStubFactory;
+unit Emballo.DI.PreBuiltFactoryTests;
 
 interface
 
 uses
-  EbFactory;
+  TestFramework;
 
 type
-  TStubFactory = class(TInterfacedObject, IFactory)
-  private
-    function GetGUID: TGUID;
-    function GetInstance: IInterface;
+  TPreBuiltFactoryTests = class(TTestCase)
+  published
+    procedure TestConstructWithNilInstance;
   end;
 
 implementation
 
-{ TStubFactory }
+uses
+  Emballo.DI.Factory, Emballo.DI.PreBuiltFactory, SysUtils;
 
-function TStubFactory.GetGUID: TGUID;
+{ TPreBuiltFactoryTests }
+
+procedure TPreBuiltFactoryTests.TestConstructWithNilInstance;
+var
+  Factory: IFactory;
 begin
-  Result := IInterface;
+  try
+    Factory := TPreBuiltFactory.Create(IInterface, Nil);
+    Fail('Instantiating TPreBuiltFactory with instance as Nil must raise an EArgumentException');
+  except
+    on EArgumentException do CheckTrue(True);
+  end;
 end;
 
-function TStubFactory.GetInstance: IInterface;
-begin
-  Result := Nil;
-end;
+initialization
+RegisterTest(TPreBuiltFactoryTests.Suite);
 
 end.

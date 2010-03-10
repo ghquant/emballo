@@ -16,12 +16,12 @@
     License along with Emballo.
     If not, see <http://www.gnu.org/licenses/>. }
 
-unit EbRegistry;
+unit Emballo.DI.Registry;
 
 interface
 
 uses
-  EbFactory, EbRegister, EbRegisterImpl, EbUtil;
+  Emballo.DI.Factory, Emballo.DI.Register, Emballo.DI.RegisterImpl, Emballo.DI.Util;
 
 { Returns a registered IFactory that can handle the specified GUID. If none can
   be found, return Nil. }
@@ -44,8 +44,8 @@ procedure ClearRegistry;
 implementation
 
 uses
-  Generics.Collections, EbDynamicFactory, EbPreBuiltFactory, SysUtils,
-  EbPoolFactory;
+  Generics.Collections, Emballo.DI.DynamicFactory, Emballo.DI.PreBuiltFactory, SysUtils,
+  Emballo.DI.PoolFactory;
 
 var
   Registry: TList<IFactory>;

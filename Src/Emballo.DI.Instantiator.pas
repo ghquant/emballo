@@ -16,7 +16,7 @@
     License along with Emballo.
     If not, see <http://www.gnu.org/licenses/>. }
 
-unit EbInstantiator;
+unit Emballo.DI.Instantiator;
 
 interface
 
@@ -91,7 +91,7 @@ type
 implementation
 
 uses
-  EbRegistry, EbUtil, EbFactory;
+  Emballo.DI.Registry, Emballo.DI.Util, Emballo.DI.Factory;
 
 { TInstantiator }
 

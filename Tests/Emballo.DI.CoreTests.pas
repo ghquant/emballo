@@ -16,7 +16,7 @@
     License along with Emballo.
     If not, see <http://www.gnu.org/licenses/>. }
 
-unit EbPreBuiltFactoryTests;
+unit Emballo.DI.CoreTests;
 
 interface
 
@@ -24,31 +24,46 @@ uses
   TestFramework;
 
 type
-  TPreBuiltFactoryTests = class(TTestCase)
+  TEmballoTests = class(TTestCase)
   published
-    procedure TestConstructWithNilInstance;
+    procedure TestGet;
   end;
+
+  INotRegisteredInterface = interface
+    ['{5AE8F8FE-AE96-4250-B901-884F647EC48B}']
+  end;
+
+var
+  Info: Pointer;
 
 implementation
 
 uses
-  EbFactory, EbPreBuiltFactory, SysUtils;
+  Emballo.DI.Registry, Emballo.DI.Core, SysUtils;
 
-{ TPreBuiltFactoryTests }
+{ TEmballoTests }
 
-procedure TPreBuiltFactoryTests.TestConstructWithNilInstance;
-var
-  Factory: IFactory;
+procedure TEmballoTests.TestGet;
 begin
+  { 1. Test if an exception is raised if we call Emballo.Get with a non interface type }
   try
-    Factory := TPreBuiltFactory.Create(IInterface, Nil);
-    Fail('Instantiating TPreBuiltFactory with instance as Nil must raise an EArgumentException');
+    Emballo.DI.Core.Emballo.Get<TObject>;
+    Fail('Calling Emballo.Get with a type other than an interface type must raise a EArgumentException');
   except
     on EArgumentException do CheckTrue(True);
+  end;
+
+  { 2. Test if it raises an exception if the instance can't be built }
+  try
+    Emballo.DI.Core.Emballo.Get<INotRegisteredInterface>;
+    Fail('Calling BuildInstance for an interface that can''t be instantiated must raise an ECouldNotBuild');
+  except
+    on ECouldNotBuild do CheckTrue(True);
   end;
 end;
 
 initialization
-RegisterTest(TPreBuiltFactoryTests.Suite);
+Info := TypeInfo(INotRegisteredInterface);
+RegisterTest(TEmballoTests.Suite);
 
 end.

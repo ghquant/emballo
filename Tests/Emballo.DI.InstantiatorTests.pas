@@ -16,12 +16,12 @@
     License along with Emballo.
     If not, see <http://www.gnu.org/licenses/>. }
 
-unit EbInstantiatorTests;
+unit Emballo.DI.InstantiatorTests;
 
 interface
 
 uses
-  TestFramework, EbInstantiator;
+  TestFramework, Emballo.DI.Instantiator;
 
 type
   TInstantiatorHack = class(TInstantiator)

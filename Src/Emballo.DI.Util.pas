@@ -16,7 +16,7 @@
     License along with Emballo.
     If not, see <http://www.gnu.org/licenses/>. }
 
-unit EbUtil;
+unit Emballo.DI.Util;
 
 interface
 

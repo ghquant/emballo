@@ -16,12 +16,12 @@
     License along with Emballo.
     If not, see <http://www.gnu.org/licenses/>. }
 
-unit EbPoolFactory;
+unit Emballo.DI.PoolFactory;
 
 interface
 
 uses
-  EbAbstractWrapperFactory, Ebfactory, Classes, Generics.Collections;
+  Emballo.DI.AbstractWrapperFactory, Emballo.DI.Factory, Classes, Generics.Collections;
 
 type
   TStub = array[0..MAXINT - 1] of Byte;
@@ -41,6 +41,7 @@ type
   private
     FStub: PStub;
     FGeneraedStub: PStub;
+    FOldProtect: Cardinal;
     procedure SetJumpAddress(JumpDestination: Pointer);
     procedure GenerateStub(HackedRelease: THackedRelease);
   public
@@ -285,6 +286,8 @@ begin
   { ret $0004
     Return to the caller }
   Put($C2); Put($04); Put($00);
+
+  VirtualProtect(FGeneraedStub, 17, PAGE_EXECUTE_READWRITE, FOldProtect);
 end;
 
 procedure TStubPatch.Patch(HackedRelease: THackedRelease);
@@ -315,6 +318,7 @@ end;
 procedure TStubPatch.Unpatch(OriginalRelease: Pointer);
 begin
   SetJumpAddress(OriginalRelease);
+  VirtualProtect(FGeneraedStub, 17, FOldProtect, FOldProtect);
   FreeMem(FGeneraedStub);
 end;
 

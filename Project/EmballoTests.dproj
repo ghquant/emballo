@@ -54,13 +54,13 @@
 			<DelphiCompile Include="EmballoTests.dpr">
 				<MainSource>MainSource</MainSource>
 			</DelphiCompile>
-			<DCCReference Include="..\Tests\EbInstantiatorTests.pas"/>
-			<DCCReference Include="..\Tests\EbCoreTests.pas"/>
-			<DCCReference Include="..\Tests\EbPreBuiltFactoryTests.pas"/>
-			<DCCReference Include="..\Tests\EbPoolFactoryTests.pas"/>
-			<DCCReference Include="..\Tests\EbDelegateFactory.pas"/>
-			<DCCReference Include="..\Tests\EbRegisterImplTests.pas"/>
-			<DCCReference Include="..\Tests\EbStubFactory.pas"/>
+			<DCCReference Include="..\Tests\Emballo.DI.InstantiatorTests.pas"/>
+			<DCCReference Include="..\Tests\Emballo.DI.CoreTests.pas"/>
+			<DCCReference Include="..\Tests\Emballo.DI.PreBuiltFactoryTests.pas"/>
+			<DCCReference Include="..\Tests\Emballo.DI.PoolFactoryTests.pas"/>
+			<DCCReference Include="..\Tests\Emballo.DI.DelegateFactory.pas"/>
+			<DCCReference Include="..\Tests\Emballo.DI.RegisterImplTests.pas"/>
+			<DCCReference Include="..\Tests\Emballo.DI.StubFactory.pas"/>
 			<BuildConfiguration Include="Base">
 				<Key>Base</Key>
 			</BuildConfiguration>

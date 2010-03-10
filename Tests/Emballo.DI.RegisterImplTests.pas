@@ -16,37 +16,56 @@
     License along with Emballo.
     If not, see <http://www.gnu.org/licenses/>. }
 
-unit EbAbstractFactory;
+unit Emballo.DI.RegisterImplTests;
 
 interface
 
 uses
-  EbFactory;
+  TestFramework, Emballo.DI.Factory, Generics.Collections;
 
 type
-  { Base class for implementing factories }
-  TAbstractFactory = class abstract(TInterfacedObject, IFactory)
+  TRegisterTests = class(TTestCase)
   private
-    FGUID: TGUID;
+    FRegistry: TList<IFactory>;
   protected
-    function GetGUID: TGUID;
-    function GetInstance: IInterface; virtual; abstract;
-  public
-    constructor Create(GUID: TGUID);
+    procedure SetUp; override;
+    procedure TearDown; override;
+  published
+    procedure TestDone;
   end;
 
 implementation
 
-{ TAbstractFactory }
+uses
+  Emballo.DI.Register, Emballo.DI.RegisterImpl, Emballo.DI.StubFactory;
 
-constructor TAbstractFactory.Create(GUID: TGUID);
+{ TRegisterTests }
+
+procedure TRegisterTests.SetUp;
 begin
-  FGUID := GUID;
+  inherited;
+  FRegistry := TList<IFactory>.Create;
 end;
 
-function TAbstractFactory.GetGUID: TGUID;
+procedure TRegisterTests.TearDown;
 begin
-  Result := FGUID;
+  inherited;
+  FRegistry.Free;
 end;
+
+procedure TRegisterTests.TestDone;
+var
+  Factory: IFactory;
+  LRegister: IRegister;
+begin
+  Factory := TStubFactory.Create;
+  LRegister := TRegister.Create(Factory, FRegistry);
+  LRegister.Done;
+  CheckEquals(1, FRegistry.Count);
+  CheckTrue(Factory = FRegistry[0]);
+end;
+
+initialization
+RegisterTest(TRegisterTests.Suite);
 
 end.

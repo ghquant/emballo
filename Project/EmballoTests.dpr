@@ -37,13 +37,13 @@ uses
   TestFramework,
   GUITestRunner,
   TextTestRunner,
-  EbInstantiatorTests in '..\Tests\EbInstantiatorTests.pas',
-  EbCoreTests in '..\Tests\EbCoreTests.pas',
-  EbPreBuiltFactoryTests in '..\Tests\EbPreBuiltFactoryTests.pas',
-  EbPoolFactoryTests in '..\Tests\EbPoolFactoryTests.pas',
-  EbDelegateFactory in '..\Tests\EbDelegateFactory.pas',
-  EbRegisterImplTests in '..\Tests\EbRegisterImplTests.pas',
-  EbStubFactory in '..\Tests\EbStubFactory.pas';
+  Emballo.DI.InstantiatorTests in '..\Tests\Emballo.DI.InstantiatorTests.pas',
+  Emballo.DI.CoreTests in '..\Tests\Emballo.DI.CoreTests.pas',
+  Emballo.DI.PreBuiltFactoryTests in '..\Tests\Emballo.DI.PreBuiltFactoryTests.pas',
+  Emballo.DI.PoolFactoryTests in '..\Tests\Emballo.DI.PoolFactoryTests.pas',
+  Emballo.DI.DelegateFactory in '..\Tests\Emballo.DI.DelegateFactory.pas',
+  Emballo.DI.RegisterImplTests in '..\Tests\Emballo.DI.RegisterImplTests.pas',
+  Emballo.DI.StubFactory in '..\Tests\Emballo.DI.StubFactory.pas';
 
 {$R *.RES}
 

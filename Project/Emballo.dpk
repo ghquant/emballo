@@ -46,18 +46,18 @@ requires
   rtl;
 
 contains
-  EbCore in '..\Src\EbCore.pas',
-  EbInstantiator in '..\Src\EbInstantiator.pas',
-  EbFactory in '..\Src\EbFactory.pas',
-  EbDynamicFactory in '..\Src\EbDynamicFactory.pas',
-  EbRegistry in '..\Src\EbRegistry.pas',
-  EbUtil in '..\Src\EbUtil.pas',
-  EbPreBuiltFactory in '..\Src\EbPreBuiltFactory.pas',
-  EbAbstractFactory in '..\Src\EbAbstractFactory.pas',
-  EbAbstractWrapperFactory in '..\Src\EbAbstractWrapperFactory.pas',
-  EbSingletonFactory in '..\Src\EbSingletonFactory.pas',
-  EbPoolFactory in '..\Src\EbPoolFactory.pas',
-  EbRegisterImpl in '..\Src\EbRegisterImpl.pas',
-  EbRegister in '..\Src\EbRegister.pas';
+  Emballo.DI.Core in '..\Src\Emballo.DI.Core.pas',
+  Emballo.DI.Instantiator in '..\Src\Emballo.DI.Instantiator.pas',
+  Emballo.DI.Factory in '..\Src\Emballo.DI.Factory.pas',
+  Emballo.DI.DynamicFactory in '..\Src\Emballo.DI.DynamicFactory.pas',
+  Emballo.DI.Registry in '..\Src\Emballo.DI.Registry.pas',
+  Emballo.DI.Util in '..\Src\Emballo.DI.Util.pas',
+  Emballo.DI.PreBuiltFactory in '..\Src\Emballo.DI.PreBuiltFactory.pas',
+  Emballo.DI.AbstractFactory in '..\Src\Emballo.DI.AbstractFactory.pas',
+  Emballo.DI.AbstractWrapperFactory in '..\Src\Emballo.DI.AbstractWrapperFactory.pas',
+  Emballo.DI.SingletonFactory in '..\Src\Emballo.DI.SingletonFactory.pas',
+  Emballo.DI.PoolFactory in '..\Src\Emballo.DI.PoolFactory.pas',
+  Emballo.DI.RegisterImpl in '..\Src\Emballo.DI.RegisterImpl.pas',
+  Emballo.DI.Register in '..\Src\Emballo.DI.Register.pas';
 
 end.

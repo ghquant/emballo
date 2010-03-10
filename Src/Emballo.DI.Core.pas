@@ -16,7 +16,7 @@
     License along with Emballo.
     If not, see <http://www.gnu.org/licenses/>. }
 
-unit EbCore;
+unit Emballo.DI.Core;
 
 interface
 
@@ -40,7 +40,7 @@ function Emballo: TEmballo;
 implementation
 
 uses
-  Rtti, EbInstantiator, EbRegistry, EbUtil, TypInfo, EbFactory;
+  Rtti, Emballo.DI.Instantiator, Emballo.DI.Registry, Emballo.DI.Util, TypInfo, Emballo.DI.Factory;
 
 function Emballo: TEmballo;
 begin

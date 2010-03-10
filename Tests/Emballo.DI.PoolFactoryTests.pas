@@ -16,7 +16,7 @@
     License along with Emballo.
     If not, see <http://www.gnu.org/licenses/>. }
 
-unit EbPoolFactoryTests;
+unit Emballo.DI.PoolFactoryTests;
 
 interface
 
@@ -35,7 +35,7 @@ type
 implementation
 
 uses
-  EbDelegateFactory, EbFactory, EbPoolFactory, SysUtils;
+  Emballo.DI.DelegateFactory, Emballo.DI.Factory, Emballo.DI.PoolFactory, SysUtils;
 
 type
   TDestroyEvent = reference to procedure;

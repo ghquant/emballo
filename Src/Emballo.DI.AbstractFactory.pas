@@ -16,49 +16,37 @@
     License along with Emballo.
     If not, see <http://www.gnu.org/licenses/>. }
 
-unit EbDynamicFactory;
+unit Emballo.DI.AbstractFactory;
 
 interface
 
 uses
-  EbAbstractFactory;
+  Emballo.DI.Factory;
 
 type
-  { A factory thet relies on EbInsantiator.TInstantiator to dynamicaly build
-    the instances }
-  TDynamicFactory = class(TAbstractFactory)
+  { Base class for implementing factories }
+  TAbstractFactory = class abstract(TInterfacedObject, IFactory)
   private
-    FImplementor: TClass;
+    FGUID: TGUID;
   protected
-    function GetInstance: IInterface; override;
+    function GetGUID: TGUID;
+    function GetInstance: IInterface; virtual; abstract;
   public
-    constructor Create(GUID: TGUID; Implementor: TClass);
+    constructor Create(GUID: TGUID);
   end;
 
 implementation
 
-uses EbInstantiator, SysUtils;
+{ TAbstractFactory }
 
-{ TDynamicFactory }
-
-constructor TDynamicFactory.Create(GUID: TGUID; Implementor: TClass);
+constructor TAbstractFactory.Create(GUID: TGUID);
 begin
-  inherited Create(GUID);
-  FImplementor := Implementor;
+  FGUID := GUID;
 end;
 
-function TDynamicFactory.GetInstance: IInterface;
-var
-  Inst: TInstantiator;
-  LInstance: TObject;
+function TAbstractFactory.GetGUID: TGUID;
 begin
-  Inst := TInstantiator.Create;
-  try
-    LInstance := Inst.Instantiate(FImplementor);
-    Supports(LInstance, GetGUID, Result);
-  finally
-    Inst.Free;
-  end;
+  Result := FGUID;
 end;
 
 end.

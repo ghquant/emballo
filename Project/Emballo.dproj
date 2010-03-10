@@ -56,19 +56,19 @@
 				<MainSource>MainSource</MainSource>
 			</DelphiCompile>
 			<DCCReference Include="rtl.dcp"/>
-			<DCCReference Include="..\Src\EbCore.pas"/>
-			<DCCReference Include="..\Src\EbInstantiator.pas"/>
-			<DCCReference Include="..\Src\EbFactory.pas"/>
-			<DCCReference Include="..\Src\EbDynamicFactory.pas"/>
-			<DCCReference Include="..\Src\EbRegistry.pas"/>
-			<DCCReference Include="..\Src\EbUtil.pas"/>
-			<DCCReference Include="..\Src\EbPreBuiltFactory.pas"/>
-			<DCCReference Include="..\Src\EbAbstractFactory.pas"/>
-			<DCCReference Include="..\Src\EbAbstractWrapperFactory.pas"/>
-			<DCCReference Include="..\Src\EbSingletonFactory.pas"/>
-			<DCCReference Include="..\Src\EbPoolFactory.pas"/>
-			<DCCReference Include="..\Src\EbRegisterImpl.pas"/>
-			<DCCReference Include="..\Src\EbRegister.pas"/>
+			<DCCReference Include="..\Src\Emballo.DI.Core.pas"/>
+			<DCCReference Include="..\Src\Emballo.DI.Instantiator.pas"/>
+			<DCCReference Include="..\Src\Emballo.DI.Factory.pas"/>
+			<DCCReference Include="..\Src\Emballo.DI.DynamicFactory.pas"/>
+			<DCCReference Include="..\Src\Emballo.DI.Registry.pas"/>
+			<DCCReference Include="..\Src\Emballo.DI.Util.pas"/>
+			<DCCReference Include="..\Src\Emballo.DI.PreBuiltFactory.pas"/>
+			<DCCReference Include="..\Src\Emballo.DI.AbstractFactory.pas"/>
+			<DCCReference Include="..\Src\Emballo.DI.AbstractWrapperFactory.pas"/>
+			<DCCReference Include="..\Src\Emballo.DI.SingletonFactory.pas"/>
+			<DCCReference Include="..\Src\Emballo.DI.PoolFactory.pas"/>
+			<DCCReference Include="..\Src\Emballo.DI.RegisterImpl.pas"/>
+			<DCCReference Include="..\Src\Emballo.DI.Register.pas"/>
 			<BuildConfiguration Include="Base">
 				<Key>Base</Key>
 			</BuildConfiguration>

@@ -16,38 +16,29 @@
     License along with Emballo.
     If not, see <http://www.gnu.org/licenses/>. }
 
-unit EbAbstractWrapperFactory;
+unit Emballo.DI.Factory;
 
 interface
 
-uses
-  EbFactory;
-
 type
-  { Base factory class for factories that act like wrappers arround
-    other factories }
-  TAbstractWrapperFactory = class abstract(TInterfacedObject, IFactory)
-  private
+  { Base interface for implementing factories.
+    An factory is an object called by the framework when it needs instances of
+    given interfaces. The programmer can implement it in different ways to
+    implement a number of strategies to get instances of interfaces, aside that
+    already implemented by the framework }
+  IFactory = interface
+    ['{F5603417-3D80-4735-B66D-84FFAC15770B}']
+
     function GetGUID: TGUID;
-  protected
-    FActualFactory: IFactory;
-    function GetInstance: IInterface; virtual; abstract;
-  public
-    constructor Create(const ActualFactory: IFactory);
+
+    { The GUID that this factory can handle }
+    property GUID: TGUID read GetGUID;
+
+    { This method is called when the framework needs an instance the interface
+      handled by this factory. }
+    function GetInstance: IInterface;
   end;
 
 implementation
-
-{ TAbstractWrapperFactory }
-
-constructor TAbstractWrapperFactory.Create(const ActualFactory: IFactory);
-begin
-  FActualFactory := ActualFactory;
-end;
-
-function TAbstractWrapperFactory.GetGUID: TGUID;
-begin
-  Result := FActualFactory.GUID;
-end;
 
 end.
