@@ -16,56 +16,44 @@
     License along with Emballo.
     If not, see <http://www.gnu.org/licenses/>. }
 
-unit Emballo.DI.RegisterImplTests;
+unit Emballo.DI.DllWrapperFactory;
 
 interface
 
 uses
-  TestFramework, Emballo.DI.Factory, Generics.Collections;
+  TypInfo,
+  Emballo.DI.AbstractFactory;
 
 type
-  TRegisterTests = class(TTestCase)
+  TDllWrapperFactory = class(TAbstractFactory)
   private
-    FRegistry: TList<IFactory>;
+    FInterfaceTypeInfo: PTypeInfo;
+    FDllName: String;
   protected
-    procedure SetUp; override;
-    procedure TearDown; override;
-  published
-    procedure TestDone;
+    function GetInstance: IInterface; override;
+  public
+    constructor Create(InterfaceTypeInfo: PTypeInfo; const DllName: String);
   end;
 
 implementation
 
 uses
-  Emballo.DI.Register, Emballo.DI.RegisterImpl, Emballo.DI.StubFactory;
+  Emballo.DllWrapper,
+  Emballo.Rtti;
 
-{ TRegisterTests }
+{ TDllWrapperFactory }
 
-procedure TRegisterTests.SetUp;
+constructor TDllWrapperFactory.Create(InterfaceTypeInfo: PTypeInfo;
+  const DllName: String);
 begin
-  inherited;
-  FRegistry := TList<IFactory>.Create;
+  inherited Create(GetGUIDFromTypeInfo(InterfaceTypeInfo));
+  FInterfaceTypeInfo := InterfaceTypeInfo;
+  FDllName := DllName;
 end;
 
-procedure TRegisterTests.TearDown;
+function TDllWrapperFactory.GetInstance: IInterface;
 begin
-  inherited;
-  FRegistry.Free;
+  Result := DllWrapperService.Get(FInterfaceTypeInfo, FDllName);
 end;
-
-procedure TRegisterTests.TestDone;
-var
-  Factory: IFactory;
-  LRegister: IRegister;
-begin
-  Factory := TStubFactory.Create;
-  LRegister := TRegister.Create(Factory, FRegistry);
-  LRegister.Done;
-  CheckEquals(1, FRegistry.Count);
-  CheckTrue(Factory = FRegistry[0]);
-end;
-
-initialization
-RegisterTest('Emballo.DI', TRegisterTests.Suite);
 
 end.

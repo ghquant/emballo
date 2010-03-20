@@ -21,7 +21,7 @@ unit Emballo.DI.Registry;
 interface
 
 uses
-  Emballo.DI.Factory, Emballo.DI.Register, Emballo.DI.RegisterImpl, Emballo.DI.Util;
+  Emballo.DI.Factory, Emballo.DI.Register, Emballo.DI.RegisterImpl, Emballo.Rtti;
 
 { Returns a registered IFactory that can handle the specified GUID. If none can
   be found, return Nil. }
@@ -38,6 +38,11 @@ function RegisterFactory(const GUID: TGUID; Implementor: TClass): IRegister; ove
   instance }
 function RegisterFactory(const GUID: TGUID; const Instance: IInterface): IRegister; overload;
 
+{ Starts the registration of a factory which will dynamically build an object
+  that binds the GUID interface to the specified dll, using Emballo's
+  DllWrapper features }
+function RegisterFactoryDll(const GUID: TGUID; const DllName: String): IRegister;
+
 { Removes all of the already registered factories }
 procedure ClearRegistry;
 
@@ -45,7 +50,7 @@ implementation
 
 uses
   Generics.Collections, Emballo.DI.DynamicFactory, Emballo.DI.PreBuiltFactory, SysUtils,
-  Emballo.DI.PoolFactory;
+  Emballo.DI.PoolFactory, Emballo.DI.DllWrapperFactory;
 
 var
   Registry: TList<IFactory>;
@@ -63,6 +68,12 @@ end;
 function RegisterFactory(const GUID: TGUID; const Instance: IInterface): IRegister;
 begin
   Result := RegisterFactory(TPreBuiltFactory.Create(GUID, Instance));
+end;
+
+function RegisterFactoryDll(const GUID: TGUID; const DllName: String): IRegister;
+begin
+  Result := RegisterFactory(TDllWrapperFactory.Create(GetTypeInfoFromGUID(GUID),
+    DllName));
 end;
 
 function GetFactoryFor(GUID: TGUID): IFactory;

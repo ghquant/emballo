@@ -49,6 +49,6 @@ begin
 end;
 
 initialization
-RegisterTest(TPreBuiltFactoryTests.Suite);
+RegisterTest('Emballo.DI', TPreBuiltFactoryTests.Suite);
 
 end.

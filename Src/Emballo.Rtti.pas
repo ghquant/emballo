@@ -16,7 +16,7 @@
     License along with Emballo.
     If not, see <http://www.gnu.org/licenses/>. }
 
-unit Emballo.DI.Util;
+unit Emballo.Rtti;
 
 interface
 
@@ -34,9 +34,9 @@ type
   can be found, an EUnknownGUID is raised }
 function GetTypeInfoFromGUID(GUID: TGUID): PTypeInfo;
 
-function GetRttiTypeFromGUID(Ctx: TRttiContext; GUID: TGUID): TRttiInterfaceType;
+function GetGUIDFromTypeInfo(ATypeInfo: PTypeInfo): TGUID;
 
-function GetImplementingObject(const I: IInterface): TObject;
+function GetRttiTypeFromGUID(Ctx: TRttiContext; GUID: TGUID): TRttiInterfaceType;
 
 implementation
 
@@ -71,38 +71,16 @@ begin
   end;
 end;
 
-function GetImplementingObject(const I: IInterface): TObject;
-const
-  AddByte = $04244483;
-  AddLong = $04244481;
-type
-  PAdjustSelfThunk = ^TAdjustSelfThunk;
-  TAdjustSelfThunk = packed record
-    case AddInstruction: longint of
-      AddByte : (AdjustmentByte: shortint);
-      AddLong : (AdjustmentLong: longint);
-    end;
-  PInterfaceMT = ^TInterfaceMT;
-  TInterfaceMT = packed record
-    QueryInterfaceThunk: PAdjustSelfThunk;
-  end;
-  TInterfaceRef = ^PInterfaceMT;
+function GetGUIDFromTypeInfo(ATypeInfo: PTypeInfo): TGUID;
 var
-  QueryInterfaceThunk: PAdjustSelfThunk;
+  Ctx: TRttiContext;
 begin
-  Result := Pointer(I);
-  if Assigned(Result) then
-    try
-      QueryInterfaceThunk := TInterfaceRef(I)^.QueryInterfaceThunk;
-      case QueryInterfaceThunk.AddInstruction of
-        AddByte: Inc(PChar(Result), QueryInterfaceThunk.AdjustmentByte);
-        AddLong: Inc(PChar(Result), QueryInterfaceThunk.AdjustmentLong);
-      else
-        Result := nil;
-      end;
-    except
-      Result := nil;
-    end;
+  Ctx := TRttiContext.Create;
+  try
+    Result := (Ctx.GetType(ATypeInfo) as TRttiInterfaceType).GUID;
+  finally
+    Ctx.Free;
+  end;
 end;
 
 { EUnknownGUID }

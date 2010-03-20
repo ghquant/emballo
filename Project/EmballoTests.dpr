@@ -43,7 +43,9 @@ uses
   Emballo.DI.PoolFactoryTests in '..\Tests\Emballo.DI.PoolFactoryTests.pas',
   Emballo.DI.DelegateFactory in '..\Tests\Emballo.DI.DelegateFactory.pas',
   Emballo.DI.RegisterImplTests in '..\Tests\Emballo.DI.RegisterImplTests.pas',
-  Emballo.DI.StubFactory in '..\Tests\Emballo.DI.StubFactory.pas';
+  Emballo.DI.StubFactory in '..\Tests\Emballo.DI.StubFactory.pas',
+  Emballo.Interfaces.Proxy.ImplTests in '..\Tests\Emballo.Interfaces.Proxy.ImplTests.pas',
+  Emballo.DllWrapper.ImplTests in '..\Tests\Emballo.DllWrapper.ImplTests.pas';
 
 {$R *.RES}
 

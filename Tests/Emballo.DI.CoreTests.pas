@@ -47,7 +47,7 @@ procedure TEmballoTests.TestGet;
 begin
   { 1. Test if an exception is raised if we call Emballo.Get with a non interface type }
   try
-    Emballo.DI.Core.Emballo.Get<TObject>;
+    DIService.Get<TObject>;
     Fail('Calling Emballo.Get with a type other than an interface type must raise a EArgumentException');
   except
     on EArgumentException do CheckTrue(True);
@@ -55,7 +55,7 @@ begin
 
   { 2. Test if it raises an exception if the instance can't be built }
   try
-    Emballo.DI.Core.Emballo.Get<INotRegisteredInterface>;
+    DIService.Get<INotRegisteredInterface>;
     Fail('Calling BuildInstance for an interface that can''t be instantiated must raise an ECouldNotBuild');
   except
     on ECouldNotBuild do CheckTrue(True);
@@ -64,6 +64,6 @@ end;
 
 initialization
 Info := TypeInfo(INotRegisteredInterface);
-RegisterTest(TEmballoTests.Suite);
+RegisterTest('Emballo.DI', TEmballoTests.Suite);
 
 end.

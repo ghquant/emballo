@@ -24,7 +24,7 @@ uses
   SysUtils;
 
 type
-  TEmballo = class
+  TDIService = class
   public
     function Get<ServiceInterface>: ServiceInterface; overload;
     function Get(GUID: TGUID): IInterface; overload;
@@ -35,14 +35,14 @@ type
     constructor Create(const GUID: TGUID);
   end;
 
-function Emballo: TEmballo;
+function DIService: TDIService;
 
 implementation
 
 uses
-  Rtti, Emballo.DI.Instantiator, Emballo.DI.Registry, Emballo.DI.Util, TypInfo, Emballo.DI.Factory;
+  Rtti, Emballo.DI.Instantiator, Emballo.DI.Registry, Emballo.Rtti, TypInfo, Emballo.DI.Factory;
 
-function Emballo: TEmballo;
+function DIService: TDIService;
 begin
   Result := Nil;
 end;
@@ -69,9 +69,9 @@ begin
   end;
 end;
 
-{ TEmballo }
+{ TDIService }
 
-function TEmballo.Get(GUID: TGUID): IInterface;
+function TDIService.Get(GUID: TGUID): IInterface;
 var
   Factory: IFactory;
 begin
@@ -82,7 +82,7 @@ begin
     raise ECouldNotBuild.Create(GUID);
 end;
 
-function TEmballo.Get<ServiceInterface>: ServiceInterface;
+function TDIService.Get<ServiceInterface>: ServiceInterface;
 var
   Service: IInterface;
   Ctx: TRttiContext;

@@ -74,7 +74,7 @@ var
   Hour: Word;
   TimeService: ITimeService;
 begin
-  TimeService := Emballo.DI.Core.Emballo.Get<ITimeService>;
+  TimeService := DIService.Get<ITimeService>;
   Hour := HourOf(TimeService.Now);
   if Hour in [6..11] then
     Result := 'Good morning'

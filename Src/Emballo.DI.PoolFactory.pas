@@ -21,7 +21,8 @@ unit Emballo.DI.PoolFactory;
 interface
 
 uses
-  Emballo.DI.AbstractWrapperFactory, Emballo.DI.Factory, Classes, Generics.Collections;
+  Emballo.DI.AbstractWrapperFactory, Emballo.DI.Factory, Classes,
+  Generics.Collections, Emballo.RuntimeCodeGeneration.AsmBlock;
 
 type
   TStub = array[0..MAXINT - 1] of Byte;
@@ -39,9 +40,8 @@ type
     This class is also responsible for undoing the patch operation }
   TStubPatch = class
   private
+    FAsmBlock: TAsmBlock;
     FStub: PStub;
-    FGeneraedStub: PStub;
-    FOldProtect: Cardinal;
     procedure SetJumpAddress(JumpDestination: Pointer);
     procedure GenerateStub(HackedRelease: THackedRelease);
   public
@@ -238,26 +238,9 @@ end;
 
 procedure TStubPatch.GenerateStub(HackedRelease: THackedRelease);
 var
-  Counter: Integer;
-
-  procedure Put(const Bytes; Size: Integer); overload;
-  begin
-    Move(Bytes, FGeneraedStub^[Counter], Size);
-    Inc(Counter, Size);
-  end;
-
-  procedure Put(B: Byte); overload;
-  begin
-    Put(B, 1);
-  end;
-
-  procedure Put(I: Integer); overload;
-  begin
-    Put(I, SizeOf(Integer));
-  end;
-var
   M: TMethod;
 begin
+  FAsmBlock := TAsmBlock.Create;
   { Generated stub is going to be like:
     function GeneratedStub(Self: TObject): Integer; stdcall;
     begin
@@ -266,34 +249,31 @@ begin
 
   M := TMethod(HackedRelease);
 
-  GetMem(FGeneraedStub, 17);
-  Counter := 0;
-
   { mov edx, [esp + $04]
     Takes the first parameter (the "Self") and prepares to pass it as the
     second parameter to the TPoolFactory.HackedRelease method }
-  Put($8B); Put($54); Put($24); Put($04);
+  FAsmBlock.PutB($8B); FAsmBlock.PutB($54); FAsmBlock.PutB($24); FAsmBlock.PutB($04);
 
   { mov eax, <pointer to the TPoolFactory instance>
     We'll move the address of this TPoolFactory into eax in order to pass it to
     our HackedRelease method }
-  Put($B8); Put(Integer(M.Data));
+  FAsmBlock.PutB($B8); FAsmBlock.PutI(Integer(M.Data));
 
   { call <offset the HackedRelease code address>
     Now it's OK to call the HackedRelease method }
-  Put($E8); Put(Integer(M.Code) - Integer(FGeneraedStub) - Counter - 4);
+  FAsmBlock.GenCall(M.Code);
 
   { ret $0004
     Return to the caller }
-  Put($C2); Put($04); Put($00);
+  FAsmBlock.GenRet($04);
 
-  VirtualProtect(FGeneraedStub, 17, PAGE_EXECUTE_READWRITE, FOldProtect);
+  FAsmBlock.Compile;
 end;
 
 procedure TStubPatch.Patch(HackedRelease: THackedRelease);
 begin
   GenerateStub(HackedRelease);
-  SetJumpAddress(FGeneraedStub);
+  SetJumpAddress(FAsmBlock.Block);
 end;
 
 procedure TStubPatch.SetJumpAddress(JumpDestination: Pointer);
@@ -318,8 +298,7 @@ end;
 procedure TStubPatch.Unpatch(OriginalRelease: Pointer);
 begin
   SetJumpAddress(OriginalRelease);
-  VirtualProtect(FGeneraedStub, 17, FOldProtect, FOldProtect);
-  FreeMem(FGeneraedStub);
+  FAsmBlock.Free;
 end;
 
 end.

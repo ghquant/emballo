@@ -16,36 +16,21 @@
     License along with Emballo.
     If not, see <http://www.gnu.org/licenses/>. }
 
-unit UFrmMain;
-
-interface
+library DllWrapperTest;
 
 uses
-  Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, StdCtrls;
+  SysUtils,
+  Classes;
 
-type
-  TFrmMain = class(TForm)
-    Button1: TButton;
-    procedure Button1Click(Sender: TObject);
-  end;
+{$R *.res}
 
-var
-  FrmMain: TFrmMain;
-
-implementation
-
-uses
-  UGreetingService, Emballo.DI.Core;
-
-{$R *.dfm}
-
-procedure TFrmMain.Button1Click(Sender: TObject);
-var
-  GreetingService: IGreetingService;
+function TestA(A: Byte; B: Integer; C: Extended): Extended; stdcall;
 begin
-  GreetingService := DIService.Get<IGreetingService>;
-  ShowMessage(GreetingService.Greeting);
+  Result := A + B + C;
 end;
 
+exports
+  TestA;
+
+begin
 end.

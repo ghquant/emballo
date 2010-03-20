@@ -91,7 +91,7 @@ type
 implementation
 
 uses
-  Emballo.DI.Registry, Emballo.DI.Util, Emballo.DI.Factory;
+  Emballo.DI.Registry, Emballo.Rtti, Emballo.DI.Factory;
 
 { TInstantiator }
 
@@ -156,6 +156,7 @@ var
   Args: TArray<TValue>;
   Factories: TArray<IFactory>;
   ParamInstance: IInterface;
+  TypedParamInstance: Pointer;
   ParamType: TRttiInterfaceType;
   i: Integer;
   GUID: TGUID;
@@ -183,7 +184,8 @@ begin
   for i := 0 to High(Params) do
   begin
     ParamInstance := Factories[i].GetInstance;
-    TValue.Make(@ParamInstance, GetTypeInfoFromGUID(GUID), Args[i]);
+    Supports(ParamInstance, GUID, TypedParamInstance);
+    TValue.Make(@TypedParamInstance, GetTypeInfoFromGUID(GUID), Args[i]);
   end;
 
   Instance := Ctor.Invoke(AClass, Args).AsObject;

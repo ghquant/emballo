@@ -61,7 +61,6 @@
 			<DCCReference Include="..\Src\Emballo.DI.Factory.pas"/>
 			<DCCReference Include="..\Src\Emballo.DI.DynamicFactory.pas"/>
 			<DCCReference Include="..\Src\Emballo.DI.Registry.pas"/>
-			<DCCReference Include="..\Src\Emballo.DI.Util.pas"/>
 			<DCCReference Include="..\Src\Emballo.DI.PreBuiltFactory.pas"/>
 			<DCCReference Include="..\Src\Emballo.DI.AbstractFactory.pas"/>
 			<DCCReference Include="..\Src\Emballo.DI.AbstractWrapperFactory.pas"/>
@@ -69,6 +68,17 @@
 			<DCCReference Include="..\Src\Emballo.DI.PoolFactory.pas"/>
 			<DCCReference Include="..\Src\Emballo.DI.RegisterImpl.pas"/>
 			<DCCReference Include="..\Src\Emballo.DI.Register.pas"/>
+			<DCCReference Include="..\Src\Emballo.RuntimeCodeGeneration.AsmBlock.pas"/>
+			<DCCReference Include="..\Src\Emballo.DllWrapper.pas"/>
+			<DCCReference Include="..\Src\Emballo.DllWrapper.Impl.pas"/>
+			<DCCReference Include="..\Src\Emballo.DI.DllWrapperFactory.pas"/>
+			<DCCReference Include="..\Src\Emballo.Rtti.pas"/>
+			<DCCReference Include="..\Src\Emballo.Interfaces.Proxy.Impl.pas"/>
+			<DCCReference Include="..\Src\Emballo.Interfaces.InterfacedObject.pas"/>
+			<DCCReference Include="..\Src\Emballo.RuntimeCodeGeneration.CallingConventions.pas"/>
+			<DCCReference Include="..\Src\Emballo.Interfaces.Proxy.InvokationHandler.pas"/>
+			<DCCReference Include="..\Src\Emballo.Interfaces.Proxy.InvokationHandler.ParameterImpl.pas"/>
+			<DCCReference Include="..\Src\Emballo.Interfaces.DynamicInterfaceHelper.pas"/>
 			<BuildConfiguration Include="Base">
 				<Key>Base</Key>
 			</BuildConfiguration>

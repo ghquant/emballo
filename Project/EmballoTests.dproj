@@ -61,6 +61,8 @@
 			<DCCReference Include="..\Tests\Emballo.DI.DelegateFactory.pas"/>
 			<DCCReference Include="..\Tests\Emballo.DI.RegisterImplTests.pas"/>
 			<DCCReference Include="..\Tests\Emballo.DI.StubFactory.pas"/>
+			<DCCReference Include="..\Tests\Emballo.Interfaces.Proxy.ImplTests.pas"/>
+			<DCCReference Include="..\Tests\Emballo.DllWrapper.ImplTests.pas"/>
 			<BuildConfiguration Include="Base">
 				<Key>Base</Key>
 			</BuildConfiguration>

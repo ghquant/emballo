@@ -51,13 +51,23 @@ contains
   Emballo.DI.Factory in '..\Src\Emballo.DI.Factory.pas',
   Emballo.DI.DynamicFactory in '..\Src\Emballo.DI.DynamicFactory.pas',
   Emballo.DI.Registry in '..\Src\Emballo.DI.Registry.pas',
-  Emballo.DI.Util in '..\Src\Emballo.DI.Util.pas',
   Emballo.DI.PreBuiltFactory in '..\Src\Emballo.DI.PreBuiltFactory.pas',
   Emballo.DI.AbstractFactory in '..\Src\Emballo.DI.AbstractFactory.pas',
   Emballo.DI.AbstractWrapperFactory in '..\Src\Emballo.DI.AbstractWrapperFactory.pas',
   Emballo.DI.SingletonFactory in '..\Src\Emballo.DI.SingletonFactory.pas',
   Emballo.DI.PoolFactory in '..\Src\Emballo.DI.PoolFactory.pas',
   Emballo.DI.RegisterImpl in '..\Src\Emballo.DI.RegisterImpl.pas',
-  Emballo.DI.Register in '..\Src\Emballo.DI.Register.pas';
+  Emballo.DI.Register in '..\Src\Emballo.DI.Register.pas',
+  Emballo.RuntimeCodeGeneration.AsmBlock in '..\Src\Emballo.RuntimeCodeGeneration.AsmBlock.pas',
+  Emballo.DllWrapper in '..\Src\Emballo.DllWrapper.pas',
+  Emballo.DllWrapper.Impl in '..\Src\Emballo.DllWrapper.Impl.pas',
+  Emballo.DI.DllWrapperFactory in '..\Src\Emballo.DI.DllWrapperFactory.pas',
+  Emballo.Rtti in '..\Src\Emballo.Rtti.pas',
+  Emballo.Interfaces.Proxy.Impl in '..\Src\Emballo.Interfaces.Proxy.Impl.pas',
+  Emballo.Interfaces.InterfacedObject in '..\Src\Emballo.Interfaces.InterfacedObject.pas',
+  Emballo.RuntimeCodeGeneration.CallingConventions in '..\Src\Emballo.RuntimeCodeGeneration.CallingConventions.pas',
+  Emballo.Interfaces.Proxy.InvokationHandler in '..\Src\Emballo.Interfaces.Proxy.InvokationHandler.pas',
+  Emballo.Interfaces.Proxy.InvokationHandler.ParameterImpl in '..\Src\Emballo.Interfaces.Proxy.InvokationHandler.ParameterImpl.pas',
+  Emballo.Interfaces.DynamicInterfaceHelper in '..\Src\Emballo.Interfaces.DynamicInterfaceHelper.pas';
 
 end.

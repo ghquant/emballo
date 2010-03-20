@@ -126,6 +126,6 @@ begin
 end;
 
 initialization
-RegisterTest(TInstantiatorTests.Suite);
+RegisterTest('Emballo.DI', TInstantiatorTests.Suite);
 
 end.

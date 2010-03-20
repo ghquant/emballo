@@ -61,7 +61,6 @@ var
   DelegateFactory: IDelegateFactory;
   PoolFactory: IFactory;
   InvokedFactory: Boolean;
-  InvokedDestroy: Boolean;
   Instance: IInterface;
 begin
   DelegateFactory := TDelegateFactory.Create(ITestService);
@@ -205,6 +204,6 @@ begin
 end;
 
 initialization
-RegisterTest(TPoolFactoryTests.Suite);
+RegisterTest('Emballo.DI', TPoolFactoryTests.Suite);
 
 end.
