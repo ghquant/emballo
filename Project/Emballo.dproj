@@ -56,6 +56,7 @@
 				<MainSource>MainSource</MainSource>
 			</DelphiCompile>
 			<DCCReference Include="rtl.dcp"/>
+			<DCCReference Include="dbrtl.dcp"/>
 			<DCCReference Include="..\Src\Emballo.DI.Core.pas"/>
 			<DCCReference Include="..\Src\Emballo.DI.Instantiator.pas"/>
 			<DCCReference Include="..\Src\Emballo.DI.Factory.pas"/>
@@ -79,6 +80,15 @@
 			<DCCReference Include="..\Src\Emballo.Interfaces.Proxy.InvokationHandler.pas"/>
 			<DCCReference Include="..\Src\Emballo.Interfaces.Proxy.InvokationHandler.ParameterImpl.pas"/>
 			<DCCReference Include="..\Src\Emballo.Interfaces.DynamicInterfaceHelper.pas"/>
+			<DCCReference Include="..\Src\Emballo.Hash.Algorithm.pas"/>
+			<DCCReference Include="..\Src\Emballo.Hash.Md5Algorithm.pas"/>
+			<DCCReference Include="..\Src\Emballo.Hash.Impl.Md5.pas"/>
+			<DCCReference Include="..\Src\Emballo.Hash.BaseAlgorithm.pas"/>
+			<DCCReference Include="..\Src\Emballo.Persistence.Session.pas"/>
+			<DCCReference Include="..\Src\Emballo.Persistence.Mapping.AttributeMapping.pas"/>
+			<DCCReference Include="..\Src\Emballo.Persistence.Mapping.ClassMapping.pas"/>
+			<DCCReference Include="..\Src\Emballo.TypeWrappers.pas"/>
+			<None Include="..\Src\Emballo.TypeWrappers.TypeWrapperInterfaceTemplate.inc"/>
 			<BuildConfiguration Include="Base">
 				<Key>Base</Key>
 			</BuildConfiguration>

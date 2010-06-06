@@ -45,7 +45,8 @@ uses
   Emballo.DI.RegisterImplTests in '..\Tests\Emballo.DI.RegisterImplTests.pas',
   Emballo.DI.StubFactory in '..\Tests\Emballo.DI.StubFactory.pas',
   Emballo.Interfaces.Proxy.ImplTests in '..\Tests\Emballo.Interfaces.Proxy.ImplTests.pas',
-  Emballo.DllWrapper.ImplTests in '..\Tests\Emballo.DllWrapper.ImplTests.pas';
+  Emballo.DllWrapper.ImplTests in '..\Tests\Emballo.DllWrapper.ImplTests.pas',
+  Emballo.Hash.Md5AlgorithmTests in '..\Tests\Emballo.Hash.Md5AlgorithmTests.pas';
 
 {$R *.RES}
 

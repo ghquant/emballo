@@ -46,7 +46,7 @@ type
     FDynamicInterfaceHelper: TDynamicInterfaceHelper;
     function GetStubGeneratorFor(CallingConvention: TCallConv): TStubGeneratorProc;
   protected
-    function QueryInterface(const IID: TGUID; out Obj): HRESULT; override;
+    function QueryInterface(const IID: TGUID; out Obj): HRESULT; override; stdcall;
   public
     constructor Create(InterfaceTypeInfo: PTypeInfo; const DllName: String);
     destructor Destroy; override;
@@ -251,7 +251,7 @@ begin
   end;
 
   FDynamicInterfaceHelper := TDynamicInterfaceHelper.Create(TRttiInterfaceType(RttiType).GUID,
-    @TDllWrapper.QueryInterface, @TDllWrapper._AddRef, @TDllWrapper._Release,
+    @TEbInterfacedObject.QueryInterface, @TDllWrapper._AddRef, @TDllWrapper._Release,
     Self, MethodPointers);
 end;
 

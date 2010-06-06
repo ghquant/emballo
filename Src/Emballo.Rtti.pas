@@ -34,8 +34,10 @@ type
   can be found, an EUnknownGUID is raised }
 function GetTypeInfoFromGUID(GUID: TGUID): PTypeInfo;
 
+{ Returns the GUID of an interface given it's type info }
 function GetGUIDFromTypeInfo(ATypeInfo: PTypeInfo): TGUID;
 
+{ Returns the TRttiInterfaceType of an interface, given it's GUID }
 function GetRttiTypeFromGUID(Ctx: TRttiContext; GUID: TGUID): TRttiInterfaceType;
 
 implementation
@@ -50,7 +52,7 @@ begin
   begin
     if LType is TRttiInterfaceType then
     begin
-      Result := LType as TRttiInterfaceType;
+      Result := TRttiInterfaceType(LType);
       if IsEqualGUID(Result.GUID, GUID) then
         Exit;
     end;

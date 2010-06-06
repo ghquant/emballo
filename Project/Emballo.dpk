@@ -43,7 +43,8 @@ package Emballo;
 {$IMPLICITBUILD ON}
 
 requires
-  rtl;
+  rtl,
+  dbrtl;
 
 contains
   Emballo.DI.Core in '..\Src\Emballo.DI.Core.pas',
@@ -68,6 +69,14 @@ contains
   Emballo.RuntimeCodeGeneration.CallingConventions in '..\Src\Emballo.RuntimeCodeGeneration.CallingConventions.pas',
   Emballo.Interfaces.Proxy.InvokationHandler in '..\Src\Emballo.Interfaces.Proxy.InvokationHandler.pas',
   Emballo.Interfaces.Proxy.InvokationHandler.ParameterImpl in '..\Src\Emballo.Interfaces.Proxy.InvokationHandler.ParameterImpl.pas',
-  Emballo.Interfaces.DynamicInterfaceHelper in '..\Src\Emballo.Interfaces.DynamicInterfaceHelper.pas';
+  Emballo.Interfaces.DynamicInterfaceHelper in '..\Src\Emballo.Interfaces.DynamicInterfaceHelper.pas',
+  Emballo.Hash.Algorithm in '..\Src\Emballo.Hash.Algorithm.pas',
+  Emballo.Hash.Md5Algorithm in '..\Src\Emballo.Hash.Md5Algorithm.pas',
+  Emballo.Hash.Impl.Md5 in '..\Src\Emballo.Hash.Impl.Md5.pas',
+  Emballo.Hash.BaseAlgorithm in '..\Src\Emballo.Hash.BaseAlgorithm.pas',
+  Emballo.Persistence.Session in '..\Src\Emballo.Persistence.Session.pas',
+  Emballo.Persistence.Mapping.AttributeMapping in '..\Src\Emballo.Persistence.Mapping.AttributeMapping.pas',
+  Emballo.Persistence.Mapping.ClassMapping in '..\Src\Emballo.Persistence.Mapping.ClassMapping.pas',
+  Emballo.TypeWrappers in '..\Src\Emballo.TypeWrappers.pas';
 
 end.

@@ -126,7 +126,7 @@ end;
 
 function TDynamicInterfaceHelper.QueryInterface(IID: TGUID; out Obj): HRESULT;
 var
-  OriginalQI: function(IID: TGUID; out Obj): HRESULT  of object; stdcall;
+  OriginalQI: function(const IID: TGUID; out Obj): HRESULT of object; stdcall;
 begin
   if IsEqualGUID(IID, FGUID) then
   begin

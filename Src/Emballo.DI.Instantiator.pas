@@ -183,9 +183,12 @@ begin
   SetLength(Args, Length(Params));
   for i := 0 to High(Params) do
   begin
+    ParamType := (Params[i].ParamType as TRttiInterfaceType);
+    GUID := ParamType.GUID;
+
     ParamInstance := Factories[i].GetInstance;
     Supports(ParamInstance, GUID, TypedParamInstance);
-    TValue.Make(@TypedParamInstance, GetTypeInfoFromGUID(GUID), Args[i]);
+    TValue.Make(@TypedParamInstance, ParamType.Handle, Args[i]);
   end;
 
   Instance := Ctor.Invoke(AClass, Args).AsObject;
