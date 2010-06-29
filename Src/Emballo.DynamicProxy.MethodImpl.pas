@@ -129,12 +129,11 @@ begin
   end;
 
   if Assigned(FMethod.ReturnType) then
-  begin
-    ResultParam := TParameter.Create(@ResultValue, False, FMethod.ReturnType.TypeKind);
-    FInvokationHandler(FMethod, Params, ResultParam);
-  end
+    ResultParam := TParameter.Create(@ResultValue, False, FMethod.ReturnType.TypeKind)
   else
-    FInvokationHandler(FMethod, Params, Nil);
+    ResultParam := Nil;
+
+  FInvokationHandler(FMethod, Params, ResultParam);
 end;
 
 constructor TMethodImpl.Create(const Method: TRttiMethod;
