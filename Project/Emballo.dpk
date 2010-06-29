@@ -30,8 +30,8 @@ package Emballo;
 {$LONGSTRINGS ON}
 {$OPENSTRINGS ON}
 {$OPTIMIZATION ON}
-{$OVERFLOWCHECKS OFF}
-{$RANGECHECKS OFF}
+{$OVERFLOWCHECKS ON}
+{$RANGECHECKS ON}
 {$REFERENCEINFO OFF}
 {$SAFEDIVIDE OFF}
 {$STACKFRAMES OFF}
@@ -64,11 +64,11 @@ contains
   Emballo.DllWrapper.Impl in '..\Src\Emballo.DllWrapper.Impl.pas',
   Emballo.DI.DllWrapperFactory in '..\Src\Emballo.DI.DllWrapperFactory.pas',
   Emballo.Rtti in '..\Src\Emballo.Rtti.pas',
-  Emballo.Interfaces.Proxy.Impl in '..\Src\Emballo.Interfaces.Proxy.Impl.pas',
+  Emballo.DynamicProxy.Impl in '..\Src\Emballo.DynamicProxy.Impl.pas',
   Emballo.Interfaces.InterfacedObject in '..\Src\Emballo.Interfaces.InterfacedObject.pas',
   Emballo.RuntimeCodeGeneration.CallingConventions in '..\Src\Emballo.RuntimeCodeGeneration.CallingConventions.pas',
-  Emballo.Interfaces.Proxy.InvokationHandler in '..\Src\Emballo.Interfaces.Proxy.InvokationHandler.pas',
-  Emballo.Interfaces.Proxy.InvokationHandler.ParameterImpl in '..\Src\Emballo.Interfaces.Proxy.InvokationHandler.ParameterImpl.pas',
+  Emballo.DynamicProxy.InvokationHandler in '..\Src\Emballo.DynamicProxy.InvokationHandler.pas',
+  Emballo.DynamicProxy.InvokationHandler.ParameterImpl in '..\Src\Emballo.DynamicProxy.InvokationHandler.ParameterImpl.pas',
   Emballo.Interfaces.DynamicInterfaceHelper in '..\Src\Emballo.Interfaces.DynamicInterfaceHelper.pas',
   Emballo.Hash.Algorithm in '..\Src\Emballo.Hash.Algorithm.pas',
   Emballo.Hash.Md5Algorithm in '..\Src\Emballo.Hash.Md5Algorithm.pas',
@@ -77,6 +77,18 @@ contains
   Emballo.Persistence.Session in '..\Src\Emballo.Persistence.Session.pas',
   Emballo.Persistence.Mapping.AttributeMapping in '..\Src\Emballo.Persistence.Mapping.AttributeMapping.pas',
   Emballo.Persistence.Mapping.ClassMapping in '..\Src\Emballo.Persistence.Mapping.ClassMapping.pas',
-  Emballo.TypeWrappers in '..\Src\Emballo.TypeWrappers.pas';
+  Emballo.TypeWrappers in '..\Src\Emballo.TypeWrappers.pas',
+  Emballo.Mock.MockService in '..\Src\Emballo.Mock.MockService.pas',
+  Emballo.Mock.Mock in '..\Src\Emballo.Mock.Mock.pas',
+  Emballo.Mock.MockImpl in '..\Src\Emballo.Mock.MockImpl.pas',
+  Emballo.DynamicProxy.DynamicProxyService in '..\Src\Emballo.DynamicProxy.DynamicProxyService.pas',
+  Emballo.SynteticClass in '..\Src\Emballo.SynteticClass.pas',
+  Emballo.DynamicProxy.MethodImpl in '..\Src\Emballo.DynamicProxy.MethodImpl.pas',
+  Emballo.Mock.ExpectedMethodCall in '..\Src\Emballo.Mock.ExpectedMethodCall.pas',
+  Emballo.Mock.MethodAction in '..\Src\Emballo.Mock.MethodAction.pas',
+  Emballo.Mock.DummyMethodAction in '..\Src\Emballo.Mock.DummyMethodAction.pas',
+  Emballo.Mock.RaiseExceptionClassMethodAction in '..\Src\Emballo.Mock.RaiseExceptionClassMethodAction.pas',
+  Emballo.General in '..\Src\Emballo.General.pas',
+  Emballo.Mock.ReturnValueMethodAction in '..\Src\Emballo.Mock.ReturnValueMethodAction.pas';
 
 end.

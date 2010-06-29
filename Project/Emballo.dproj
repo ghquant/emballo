@@ -20,6 +20,8 @@
 			<Base>true</Base>
 		</PropertyGroup>
 		<PropertyGroup Condition="'$(Base)'!=''">
+			<DCC_RangeChecking>true</DCC_RangeChecking>
+			<DCC_IntegerOverflowCheck>true</DCC_IntegerOverflowCheck>
 			<DCC_ImageBase>00400000</DCC_ImageBase>
 			<DesignOnlyPackage>false</DesignOnlyPackage>
 			<DCC_SymbolReferenceInfo>0</DCC_SymbolReferenceInfo>
@@ -74,11 +76,11 @@
 			<DCCReference Include="..\Src\Emballo.DllWrapper.Impl.pas"/>
 			<DCCReference Include="..\Src\Emballo.DI.DllWrapperFactory.pas"/>
 			<DCCReference Include="..\Src\Emballo.Rtti.pas"/>
-			<DCCReference Include="..\Src\Emballo.Interfaces.Proxy.Impl.pas"/>
+			<DCCReference Include="..\Src\Emballo.DynamicProxy.Impl.pas"/>
 			<DCCReference Include="..\Src\Emballo.Interfaces.InterfacedObject.pas"/>
 			<DCCReference Include="..\Src\Emballo.RuntimeCodeGeneration.CallingConventions.pas"/>
-			<DCCReference Include="..\Src\Emballo.Interfaces.Proxy.InvokationHandler.pas"/>
-			<DCCReference Include="..\Src\Emballo.Interfaces.Proxy.InvokationHandler.ParameterImpl.pas"/>
+			<DCCReference Include="..\Src\Emballo.DynamicProxy.InvokationHandler.pas"/>
+			<DCCReference Include="..\Src\Emballo.DynamicProxy.InvokationHandler.ParameterImpl.pas"/>
 			<DCCReference Include="..\Src\Emballo.Interfaces.DynamicInterfaceHelper.pas"/>
 			<DCCReference Include="..\Src\Emballo.Hash.Algorithm.pas"/>
 			<DCCReference Include="..\Src\Emballo.Hash.Md5Algorithm.pas"/>
@@ -88,6 +90,18 @@
 			<DCCReference Include="..\Src\Emballo.Persistence.Mapping.AttributeMapping.pas"/>
 			<DCCReference Include="..\Src\Emballo.Persistence.Mapping.ClassMapping.pas"/>
 			<DCCReference Include="..\Src\Emballo.TypeWrappers.pas"/>
+			<DCCReference Include="..\Src\Emballo.Mock.MockService.pas"/>
+			<DCCReference Include="..\Src\Emballo.Mock.Mock.pas"/>
+			<DCCReference Include="..\Src\Emballo.Mock.MockImpl.pas"/>
+			<DCCReference Include="..\Src\Emballo.DynamicProxy.DynamicProxyService.pas"/>
+			<DCCReference Include="..\Src\Emballo.SynteticClass.pas"/>
+			<DCCReference Include="..\Src\Emballo.DynamicProxy.MethodImpl.pas"/>
+			<DCCReference Include="..\Src\Emballo.Mock.ExpectedMethodCall.pas"/>
+			<DCCReference Include="..\Src\Emballo.Mock.MethodAction.pas"/>
+			<DCCReference Include="..\Src\Emballo.Mock.DummyMethodAction.pas"/>
+			<DCCReference Include="..\Src\Emballo.Mock.RaiseExceptionClassMethodAction.pas"/>
+			<DCCReference Include="..\Src\Emballo.General.pas"/>
+			<DCCReference Include="..\Src\Emballo.Mock.ReturnValueMethodAction.pas"/>
 			<None Include="..\Src\Emballo.TypeWrappers.TypeWrapperInterfaceTemplate.inc"/>
 			<BuildConfiguration Include="Base">
 				<Key>Base</Key>

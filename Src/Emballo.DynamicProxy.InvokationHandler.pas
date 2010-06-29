@@ -16,14 +16,19 @@
     License along with Emballo.
     If not, see <http://www.gnu.org/licenses/>. }
 
-unit Emballo.Interfaces.Proxy.InvokationHandler;
+unit Emballo.DynamicProxy.InvokationHandler;
 
 interface
 
 uses
-  Rtti;
+  Rtti, SysUtils;
 
 type
+  EParameterReadOnly = class(Exception)
+  public
+    constructor Create;
+  end;
+
   IParameter = interface
     ['{480F5D55-BDF1-4ED0-B106-E64AFF13F47E}']
     function GetAsByte: Byte;
@@ -44,9 +49,19 @@ type
     property AsBoolean: Boolean read GetAsBoolean write SetAsBoolean;
   end;
 
-  TInvokationHandler = reference to procedure(Method: TRttiMethod;
-    Parameters: TArray<IParameter>; Result: IParameter);
+  TInvokationHandlerAnonMethod = reference to procedure(const Method: TRttiMethod;
+    const Parameters: TArray<IParameter>; const Result: IParameter);
+
+  TInvokationHandlerMethod = procedure(const Method: TRttiMethod;
+    const Parameters: TArray<IParameter>; const Result: IParameter) of object;
 
 implementation
+
+{ EParameterReadOnly }
+
+constructor EParameterReadOnly.Create;
+begin
+  inherited Create('Parameter is readonly');
+end;
 
 end.

@@ -16,14 +16,14 @@
     License along with Emballo.
     If not, see <http://www.gnu.org/licenses/>. }
 
-unit Emballo.Interfaces.Proxy.InvokationHandler.ParameterImpl;
+unit Emballo.DynamicProxy.InvokationHandler.ParameterImpl;
 
 interface
 
 uses
   TypInfo,
   SysUtils,
-  Emballo.Interfaces.Proxy.InvokationHandler;
+  Emballo.DynamicProxy.InvokationHandler;
 
 type
   TParameter = class(TInterfacedObject, IParameter)
@@ -62,7 +62,7 @@ end;
 procedure TParameter.CheckCanSetValue;
 begin
   if FByValue then
-    raise Exception.Create('Error Message');
+    raise EParameterReadOnly.Create;
 end;
 
 function TParameter.GetAsBoolean: Boolean;

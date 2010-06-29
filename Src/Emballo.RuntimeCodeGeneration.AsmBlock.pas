@@ -42,7 +42,8 @@ type
 
     { General purpose routines to put arbitrary bytes on the code block }
     procedure Put(const Value; Size: Integer);
-    procedure PutB(Value: Byte);
+    procedure PutB(Value: Byte); overload;
+    procedure PutB(Values: array of Byte); overload;
     procedure PutI(Value: Integer);
     procedure PutP(Value: Pointer);
     procedure PutW(Value: Word);
@@ -115,6 +116,14 @@ procedure TAsmBlock.Put(const Value; Size: Integer);
 begin
   SetLength(FBytes, Length(FBytes) + Size);
   Move(Value, FBytes[Length(FBytes) - Size], Size);
+end;
+
+procedure TAsmBlock.PutB(Values: array of Byte);
+var
+  B: Byte;
+begin
+  for B in Values do
+    PutB(B);
 end;
 
 procedure TAsmBlock.PutB(Value: Byte);

@@ -44,9 +44,12 @@ uses
   Emballo.DI.DelegateFactory in '..\Tests\Emballo.DI.DelegateFactory.pas',
   Emballo.DI.RegisterImplTests in '..\Tests\Emballo.DI.RegisterImplTests.pas',
   Emballo.DI.StubFactory in '..\Tests\Emballo.DI.StubFactory.pas',
-  Emballo.Interfaces.Proxy.ImplTests in '..\Tests\Emballo.Interfaces.Proxy.ImplTests.pas',
+  Emballo.DynamicProxy.ImplTests in '..\Tests\Emballo.DynamicProxy.ImplTests.pas',
   Emballo.DllWrapper.ImplTests in '..\Tests\Emballo.DllWrapper.ImplTests.pas',
-  Emballo.Hash.Md5AlgorithmTests in '..\Tests\Emballo.Hash.Md5AlgorithmTests.pas';
+  Emballo.Hash.Md5AlgorithmTests in '..\Tests\Emballo.Hash.Md5AlgorithmTests.pas',
+  Emballo.DynamicProxy.MethodImplTests in '..\Tests\Emballo.DynamicProxy.MethodImplTests.pas',
+  Emballo.SynteticClassTests in '..\Tests\Emballo.SynteticClassTests.pas',
+  Emballo.Mock.MockImplTests in '..\Tests\Emballo.Mock.MockImplTests.pas';
 
 {$R *.RES}
 

@@ -44,7 +44,7 @@ type
   private
     FName: String;
     FCallConv: TCallConv;
-    FStackCleaningStrategy: TStackCleaningResponsability;
+    FStackCleaningResponsability: TStackCleaningResponsability;
 
     function GetName: String;
     function GetStackCleaningResponsability: TStackCleaningResponsability;
@@ -52,7 +52,7 @@ type
     function ParameterPassingStrategy(Parameter: TRttiParameter): TParameterPassingStrategy;
   public
     constructor Create(const Name: String; CallConv: TCallConv;
-      StackCleaningStrategy: TStackCleaningResponsability);
+      StackCleaningResponsability: TStackCleaningResponsability);
   end;
 
 function GetCallingConvention(CallingConvention: TCallConv): ICallingConvention;
@@ -95,11 +95,11 @@ end;
 { TCallingConvention }
 
 constructor TCallingConvention.Create(const Name: String; CallConv: TCallConv;
-  StackCleaningStrategy: TStackCleaningResponsability);
+  StackCleaningResponsability: TStackCleaningResponsability);
 begin
   FName := Name;
   FCallConv := CallConv;
-  FStackCleaningStrategy := StackCleaningStrategy;
+  FStackCleaningResponsability := StackCleaningResponsability;
 end;
 
 function TCallingConvention.GetName: String;
@@ -109,7 +109,7 @@ end;
 
 function TCallingConvention.GetStackCleaningResponsability: TStackCleaningResponsability;
 begin
-  Result := FStackCleaningStrategy;
+  Result := FStackCleaningResponsability;
 end;
 
 function TCallingConvention.NumBytesForPassingParameterOnTheStack(
