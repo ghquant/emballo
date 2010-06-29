@@ -173,7 +173,7 @@ begin
   { mov ebp, esp }
   FGeneratedMethod.PutB([$8B, $EC]);
 
-  { add esp, -<space for three integer variables> + SizeOfResult }
+  { add esp, -(<space for three integer variables> + SizeOfResult) }
   FGeneratedMethod.PutB([$83, $C4, Byte(-3*SizeOf(Integer) - SizeOfResult)]);
 
   { 3. Save the current eax value }
