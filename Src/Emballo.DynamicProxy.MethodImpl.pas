@@ -159,6 +159,8 @@ var
   Param: TRttiParameter;
   SizeOfResult: Integer;
 begin
+  CallingConvention := GetCallingConvention(FMethod.CallingConvention);
+
   if Assigned(FMethod.ReturnType) then
     SizeOfResult := FMethod.ReturnType.TypeSize
   else
@@ -242,20 +244,14 @@ begin
   FGeneratedMethod.PutB($5D);
 
   { 15. Return to the caller }
-  if FMethod.CallingConvention in [ccCdecl, ccReg] then
-  begin
-    { When cdecl and register, the caller is responsible for cleaning the stack }
+  if CallingConvention.StackCleaningResponsability = scCaller then
     FGeneratedMethod.GenRet
-  end
   else
   begin
-    CallingConvention := GetCallingConvention(FMethod.CallingConvention);
-
     NumBytes := 0;
     for Param in FMethod.GetParameters do
       Inc(NumBytes, CallingConvention.NumBytesForPassingParameterOnTheStack(Param));
 
-    { When stdcall and pascal, the callee is responsible for cleaning the stack }
     FGeneratedMethod.GenRet(NumBytes);
   end;
 end;
