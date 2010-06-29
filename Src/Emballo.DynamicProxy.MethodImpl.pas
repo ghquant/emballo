@@ -32,6 +32,7 @@ type
     FInvokationHandler: TInvokationHandlerAnonMethod;
     FMethod: TRttiMethod;
     function GetCodeAddress: Pointer;
+    procedure GenerateReturnCode;
     procedure GenerateMethod;
     procedure CallInvokationHander(const ParamsBaseStackAddress: Pointer;
       Eax, Edx, Ecx, ResultValue: Pointer); stdcall;
@@ -69,7 +70,6 @@ var
   PassByValue: Boolean;
   i: Integer;
   CurrentStackAddress: PByte;
-  ResultBuffer: Pointer;
   ResultParam: IParameter;
 begin
   CallingConvention := GetCallingConvention(FMethod.CallingConvention);
@@ -130,18 +130,8 @@ begin
 
   if Assigned(FMethod.ReturnType) then
   begin
-    GetMem(ResultBuffer, FMethod.ReturnType.TypeSize);
-    try
-      FillChar(ResultBuffer^, FMethod.ReturnType.TypeSize, #0);
-
-      ResultParam := TParameter.Create(@ResultBuffer, False, FMethod.ReturnType.TypeKind);
-
-      FInvokationHandler(FMethod, Params, ResultParam);
-
-      Move(ResultBuffer^, ResultValue^, FMethod.ReturnType.TypeSize);
-    finally
-      FreeMem(ResultBuffer);
-    end;
+    ResultParam := TParameter.Create(@ResultValue, False, FMethod.ReturnType.TypeKind);
+    FInvokationHandler(FMethod, Params, ResultParam);
   end
   else
     FInvokationHandler(FMethod, Params, Nil);
@@ -168,16 +158,22 @@ var
   CallingConvention: ICallingConvention;
   NumBytes: Integer;
   Param: TRttiParameter;
+  SizeOfResult: Integer;
 begin
-  { 1. Prepare the stack frame for three integer variables }
+  if Assigned(FMethod.ReturnType) then
+    SizeOfResult := FMethod.ReturnType.TypeSize
+  else
+    SizeOfResult := 0;
+
+  { 1. Prepare the stack frame for three integer variables + result variable}
   { push ebp }
   FGeneratedMethod.PutB($55);
 
   { mov ebp, esp }
   FGeneratedMethod.PutB([$8B, $EC]);
 
-  { add esp, -<space for four integer variables> }
-  FGeneratedMethod.PutB([$83, $C4, Byte(-4*SizeOf(Integer))]);
+  { add esp, -<space for three integer variables> + SizeOfResult }
+  FGeneratedMethod.PutB([$83, $C4, Byte(-3*SizeOf(Integer) - SizeOfResult)]);
 
   { 3. Save the current eax value }
   { mov [ebp-$04], eax }
@@ -223,7 +219,7 @@ begin
     as the 2nd parameter to CallInvokationHandler. This is the base address to access
     the parameters which are on the stack }
   { mov edx, [esp+$04] }
-  FGeneratedMethod.PutB([$8D, $54, $24, 9*SizeOf(Integer)]);
+  FGeneratedMethod.PutB([$8D, $54, $24, 8*SizeOf(Integer) + SizeOfResult]);
 
   { puah edx }
   FGeneratedMethod.PutB($52);
@@ -236,12 +232,8 @@ begin
   { call TMethodImpl.CallInvokationHander }
   FGeneratedMethod.GenCall(@TMethodImpl.CallInvokationHander);
 
-  { 13. If the method returns something, then put it on eax }
-  if Assigned(FMethod.ReturnType) then
-  begin
-    { mov eax, [ebp-$10] }
-    FGeneratedMethod.PutB([$8B, $45, $F0]);
-  end;
+  { 13. If the method has a return value, do it }
+  GenerateReturnCode;
 
   { 14. Undo the stack frame }
   { mov esp, ebp }
@@ -267,6 +259,28 @@ begin
     { When stdcall and pascal, the callee is responsible for cleaning the stack }
     FGeneratedMethod.GenRet(NumBytes);
   end;
+end;
+
+procedure TMethodImpl.GenerateReturnCode;
+  procedure ReturnOnEax;
+  begin
+    { mov eax, [ebp-$10] }
+    FGeneratedMethod.PutB([$8B, $45, $F0]);
+  end;
+
+  procedure ReturnFloat;
+  begin
+    { fld qword ptr [esp-$10] }
+    FGeneratedMethod.PutB([$DD, $45, $F0]);
+  end;
+begin
+  if not Assigned(FMethod.ReturnType) then
+    Exit;
+
+  if FMethod.ReturnType.TypeKind = tkFloat then
+    ReturnFloat
+  else
+    ReturnOnEax;
 end;
 
 function TMethodImpl.GetCodeAddress: Pointer;

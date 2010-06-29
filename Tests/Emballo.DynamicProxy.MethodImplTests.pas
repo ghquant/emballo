@@ -10,6 +10,7 @@ type
   public
     procedure ConstDoubleParamRegisterCallingConvention(const A: Double); register;
     function IntegerResultRegisterCallingConvention: Integer; register;
+    function DoubleResultRegisterCallingConvention: Double; register;
   end;
 
   TMethodImplTests = class(TTestCase)
@@ -23,7 +24,8 @@ type
     procedure TearDown; override;
   published
     procedure ConstParametersShouldBeReadOnly;
-    procedure TestResult;
+    procedure TestIntegerResult;
+    procedure TestDoubleResult;
   end;
 
 implementation
@@ -49,7 +51,31 @@ begin
   FRttiContext.Free;
 end;
 
-procedure TMethodImplTests.TestResult;
+procedure TMethodImplTests.TestDoubleResult;
+var
+  MethodImpl: TMethodImpl;
+  M: function: Double of object;
+  InvokationHandler: TInvokationHandlerAnonMethod;
+  ReturnValue: Double;
+begin
+  InvokationHandler := procedure(const Method: TRttiMethod;
+    const Parameters: TArray<IParameter>; const Result: IParameter)
+  begin
+    Result.AsDouble := 3.14;
+  end;
+
+  MethodImpl := GetMethod('DoubleResultRegisterCallingConvention', Invokationhandler);
+  try
+    TMethod(M).Code := MethodImpl.CodeAddress;
+    ReturnValue := M;
+
+    CheckEquals(3.14, ReturnValue, 0.001, 'Shoult capture method return value');
+  finally
+    MethodImpl.Free;
+  end;
+end;
+
+procedure TMethodImplTests.TestIntegerResult;
 var
   MethodImpl: TMethodImpl;
   M: function: Integer of object;
@@ -101,6 +127,11 @@ end;
 { TTestClass }
 
 procedure TTestClass.ConstDoubleParamRegisterCallingConvention(const A: Double);
+begin
+
+end;
+
+function TTestClass.DoubleResultRegisterCallingConvention: Double;
 begin
 
 end;
