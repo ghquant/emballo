@@ -176,6 +176,11 @@ begin
   { xchg eax, dcx }
   FNewDestroy.PutB($92);
 
+  { After the parameters are set, just jump into TSynteticClass.NewDestroy.
+    Note that this is a jump, not a call. A call would return to it's caller (which happens
+    to be the method we're defining here), but we don't want this. The NewDestroy will
+    call the Finalizer, which may free this TSynteticClass itself. If that happens,
+    we would not want to return here because this memory area would be already free'd }
   FNewDestroy.GenJmp(@TSynteticClass.NewDestroy);
 
   FNewDestroy.Compile;

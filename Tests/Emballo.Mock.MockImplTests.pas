@@ -122,7 +122,6 @@ end;
 
 function TMocked.FooWithIntegerReturn: Integer;
 begin
-
 end;
 
 initialization
