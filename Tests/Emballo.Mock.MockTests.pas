@@ -98,7 +98,7 @@ end;
 procedure TMockTests.TearDown;
 begin
   inherited;
-
+  FMock.Free;
 end;
 
 procedure TMockTests.VerifyUsageMustFailIfUsageWasNotAsExpected;

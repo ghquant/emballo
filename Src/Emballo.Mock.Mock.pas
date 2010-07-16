@@ -36,6 +36,7 @@ type
     procedure WillRaise(ExceptionClass: TExceptionClass);
     procedure WillReturn(const Value: Integer);
     class function Create: TMock<T>; static;
+    procedure Free;
   end;
 
 implementation
@@ -53,6 +54,11 @@ end;
 function TMock<T>.Expects: T;
 begin
   Result := FInternal.Expects;
+end;
+
+procedure TMock<T>.Free;
+begin
+  FInternal := Nil;
 end;
 
 function TMock<T>.GetObject: T;
