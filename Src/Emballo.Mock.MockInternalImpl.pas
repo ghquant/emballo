@@ -26,6 +26,7 @@ uses
   Generics.Collections,
   Emballo.General,
   Emballo.Mock.ExpectedMethodCall,
+  Emballo.Mock.MethodAction,
   Emballo.Mock.MockInternal,
   Emballo.Mock.When;
 
@@ -38,6 +39,7 @@ type
     FState: TMockState;
     FExpectedCalls: TList<TExpectedMethodCall>;
     FCurrentExpectation: TExpectedMethodCall;
+    function BeginExpectation(Action: IMethodAction): IWhen<T>;
     function GetObject: T;
     function Expects: T;
     procedure VerifyUsage;
@@ -61,6 +63,14 @@ uses
   Emballo.Mock.ReturnValueMethodAction;
 
 { TMockInternal<T> }
+
+function TMockInternal<T>.BeginExpectation(Action: IMethodAction): IWhen<T>;
+begin
+  FCurrentExpectation := TExpectedMethodCall.Create;
+  FCurrentExpectation.Action := Action;
+  Result := Self;
+  FState := msDefiningExpectation;
+end;
 
 constructor TMockInternal<T>.Create;
 var
@@ -108,10 +118,7 @@ end;
 
 function TMockInternal<T>.Expects: T;
 begin
-  FCurrentExpectation := TExpectedMethodCall.Create;
-  FCurrentExpectation.Action := TDummyMethodAction.Create;
-  Result := FObject;
-  FState := msDefiningExpectation;
+  Result := BeginExpectation(TDummyMethodAction.Create).When;
 end;
 
 function TMockInternal<T>.GetObject: T;
@@ -132,18 +139,12 @@ end;
 
 function TMockInternal<T>.WillRaise(ExceptionClass: TExceptionClass): IWhen<T>;
 begin
-  FCurrentExpectation := TExpectedMethodCall.Create;
-  FCurrentExpectation.Action := TRaiseExceptionClassMethodAction.Create(ExceptionClass);
-  Result := Self;
-  FState := msDefiningExpectation;
+  Result := BeginExpectation(TRaiseExceptionClassMethodAction.Create(ExceptionClass));
 end;
 
 function TMockInternal<T>.WillReturn(const Value: Integer): IWhen<T>;
 begin
-  FCurrentExpectation := TExpectedMethodCall.Create;
-  FCurrentExpectation.Action := TReturnValueMethodAction<Integer>.Create(Value);
-  Result := Self;
-  FState := msDefiningExpectation;
+  Result := BeginExpectation(TReturnValueMethodAction<Integer>.Create(Value));
 end;
 
 end.
