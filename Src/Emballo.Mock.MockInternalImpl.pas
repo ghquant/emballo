@@ -26,12 +26,13 @@ uses
   Generics.Collections,
   Emballo.General,
   Emballo.Mock.ExpectedMethodCall,
-  Emballo.Mock.MockInternal;
+  Emballo.Mock.MockInternal,
+  Emballo.Mock.When;
 
 type
-  TMockState = (msCheckingUsage, msWaitingExpectation);
+  TMockState = (msCheckingUsage, msWaitingExpectation, msDefiningExpectation);
 
-  TMockInternal<T:class> = class(TInterfacedObject, IMockInternal<T>)
+  TMockInternal<T:class> = class(TInterfacedObject, IMockInternal<T>, IWhen<T>)
   private
     FObject: T;
     FState: TMockState;
@@ -40,8 +41,9 @@ type
     function GetObject: T;
     function Expects: T;
     procedure VerifyUsage;
-    procedure WillRaise(ExceptionClass: TExceptionClass);
+    function WillRaise(ExceptionClass: TExceptionClass): IWhen<T>;
     procedure WillReturn(const Value: Integer);
+    function When: T;
   public
     constructor Create;
     destructor Destroy; override;
@@ -79,11 +81,10 @@ begin
         FExpectedCalls[0].Free;
         FExpectedCalls.Delete(0);
       end;
-      msWaitingExpectation:
+      msDefiningExpectation:
       begin
         FState := msCheckingUsage;
-        FCurrentExpectation := TExpectedMethodCall.Create(Method);
-        FCurrentExpectation.Action := TDummyMethodAction.Create;
+        FCurrentExpectation.Method := Method;
         FExpectedCalls.Add(FCurrentExpectation);
       end;
     end;
@@ -107,8 +108,10 @@ end;
 
 function TMockInternal<T>.Expects: T;
 begin
+  FCurrentExpectation := TExpectedMethodCall.Create;
+  FCurrentExpectation.Action := TDummyMethodAction.Create;
   Result := FObject;
-  FState := msWaitingExpectation;
+  FState := msDefiningExpectation;
 end;
 
 function TMockInternal<T>.GetObject: T;
@@ -122,9 +125,17 @@ begin
     raise EUnexpectedUsage.Create('Expected calls didn''t happen');
 end;
 
-procedure TMockInternal<T>.WillRaise(ExceptionClass: TExceptionClass);
+function TMockInternal<T>.When: T;
 begin
+  Result := FObject;
+end;
+
+function TMockInternal<T>.WillRaise(ExceptionClass: TExceptionClass): IWhen<T>;
+begin
+  FCurrentExpectation := TExpectedMethodCall.Create;
   FCurrentExpectation.Action := TRaiseExceptionClassMethodAction.Create(ExceptionClass);
+  Result := Self;
+  FState := msDefiningExpectation;
 end;
 
 procedure TMockInternal<T>.WillReturn(const Value: Integer);

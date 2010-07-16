@@ -92,6 +92,7 @@ contains
   Emballo.Mock.ReturnValueMethodAction in '..\Src\Emballo.Mock.ReturnValueMethodAction.pas',
   Emballo.DynamicProxy.InterfaceProxy in '..\Src\Emballo.DynamicProxy.InterfaceProxy.pas',
   Emballo.Mock.MockInternal in '..\Src\Emballo.Mock.MockInternal.pas',
-  Emballo.Mock.UnexpectedUsage in '..\Src\Emballo.Mock.UnexpectedUsage.pas';
+  Emballo.Mock.UnexpectedUsage in '..\Src\Emballo.Mock.UnexpectedUsage.pas',
+  Emballo.Mock.When in '..\Src\Emballo.Mock.When.pas';
 
 end.

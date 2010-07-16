@@ -23,7 +23,8 @@ interface
 uses
   SysUtils,
   Emballo.General,
-  Emballo.Mock.MockInternal;
+  Emballo.Mock.MockInternal,
+  Emballo.Mock.When;
 
 type
   TMock<T:class> = record
@@ -33,7 +34,7 @@ type
     function GetObject: T;
     function Expects: T;
     procedure VerifyUsage;
-    procedure WillRaise(ExceptionClass: TExceptionClass);
+    function WillRaise(ExceptionClass: TExceptionClass): IWhen<T>;
     procedure WillReturn(const Value: Integer);
     class function Create: TMock<T>; static;
     procedure Free;
@@ -77,9 +78,9 @@ begin
   FInternal.VerifyUsage;
 end;
 
-procedure TMock<T>.WillRaise(ExceptionClass: TExceptionClass);
+function TMock<T>.WillRaise(ExceptionClass: TExceptionClass): IWhen<T>;
 begin
-  FInternal.WillRaise(ExceptionClass);
+  Result := FInternal.WillRaise(ExceptionClass);
 end;
 
 procedure TMock<T>.WillReturn(const Value: Integer);

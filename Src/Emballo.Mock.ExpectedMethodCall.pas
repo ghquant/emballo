@@ -30,19 +30,10 @@ type
     FMethod: TRttiMethod;
     FAction: IMethodAction;
   public
-    property Method: TRttiMethod read FMethod;
+    property Method: TRttiMethod read FMethod write FMethod;
     property Action: IMethodAction read FAction write FAction;
-
-    constructor Create(const Method: TRttiMethod);
   end;
 
 implementation
-
-{ TExpectedMethodCall }
-
-constructor TExpectedMethodCall.Create(const Method: TRttiMethod);
-begin
-  FMethod := Method;
-end;
 
 end.

@@ -16,29 +16,15 @@
     License along with Emballo.
     If not, see <http://www.gnu.org/licenses/>. }
 
-unit Emballo.Mock.MockInternal;
+unit Emballo.Mock.When;
 
 interface
 
-uses
-  SysUtils,
-  Emballo.Mock.When;
-
 type
-  TExceptionClass = class of Exception;
+  IWhen<T:class> = interface
+    ['{57940452-B5E5-41FC-9B37-5237BA68BDB2}']
 
-  IMockInternal<T:class> = interface
-    ['{34CB781C-7C84-47A7-B829-35D3AA6DE766}']
-
-    function GetObject: T;
-
-    function Expects: T;
-
-    procedure VerifyUsage;
-
-    function WillRaise(ExceptionClass: TExceptionClass): IWhen<T>;
-
-    procedure WillReturn(const Value: Integer);
+    function When: T;
   end;
 
 implementation

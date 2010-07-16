@@ -85,8 +85,7 @@ end;
 
 procedure TMockTests.ShouldRaiseConfiguredException;
 begin
-  FMock.Expects.Foo;
-  FMock.WillRaise(ETestException);
+  FMock.WillRaise(ETestException).When.Foo;
 
   try
     FMock.GetObject.Foo;
