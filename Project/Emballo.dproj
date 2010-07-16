@@ -92,7 +92,7 @@
 			<DCCReference Include="..\Src\Emballo.TypeWrappers.pas"/>
 			<DCCReference Include="..\Src\Emballo.Mock.MockService.pas"/>
 			<DCCReference Include="..\Src\Emballo.Mock.Mock.pas"/>
-			<DCCReference Include="..\Src\Emballo.Mock.MockImpl.pas"/>
+			<DCCReference Include="..\Src\Emballo.Mock.MockInternalImpl.pas"/>
 			<DCCReference Include="..\Src\Emballo.DynamicProxy.DynamicProxyService.pas"/>
 			<DCCReference Include="..\Src\Emballo.SynteticClass.pas"/>
 			<DCCReference Include="..\Src\Emballo.DynamicProxy.MethodImpl.pas"/>
@@ -103,6 +103,8 @@
 			<DCCReference Include="..\Src\Emballo.General.pas"/>
 			<DCCReference Include="..\Src\Emballo.Mock.ReturnValueMethodAction.pas"/>
 			<DCCReference Include="..\Src\Emballo.DynamicProxy.InterfaceProxy.pas"/>
+			<DCCReference Include="..\Src\Emballo.Mock.MockInternal.pas"/>
+			<DCCReference Include="..\Src\Emballo.Mock.UnexpectedUsage.pas"/>
 			<None Include="..\Src\Emballo.TypeWrappers.TypeWrapperInterfaceTemplate.inc"/>
 			<BuildConfiguration Include="Base">
 				<Key>Base</Key>

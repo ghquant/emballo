@@ -22,26 +22,57 @@ interface
 
 uses
   SysUtils,
-  Emballo.General;
+  Emballo.General,
+  Emballo.Mock.MockInternal;
 
 type
-  EUnexpectedUsage = class(Exception)
-  end;
-
-  IMock<T:class> = interface
-    ['{34CB781C-7C84-47A7-B829-35D3AA6DE766}']
-
+  TMock<T:class> = record
+  private
+    FInternal: IMockInternal<T>;
+  public
     function GetObject: T;
-
     function Expects: T;
-
     procedure VerifyUsage;
-
     procedure WillRaise(ExceptionClass: TExceptionClass);
-
     procedure WillReturn(const Value: Integer);
+    class function Create: TMock<T>; static;
   end;
 
 implementation
+
+uses
+  Emballo.Mock.MockInternalImpl;
+
+{ TMock<T> }
+
+class function TMock<T>.Create: TMock<T>;
+begin
+  Result.FInternal := TMockInternal<T>.Create;
+end;
+
+function TMock<T>.Expects: T;
+begin
+  Result := FInternal.Expects;
+end;
+
+function TMock<T>.GetObject: T;
+begin
+  Result := FInternal.GetObject;
+end;
+
+procedure TMock<T>.VerifyUsage;
+begin
+  FInternal.VerifyUsage;
+end;
+
+procedure TMock<T>.WillRaise(ExceptionClass: TExceptionClass);
+begin
+  FInternal.WillRaise(ExceptionClass);
+end;
+
+procedure TMock<T>.WillReturn(const Value: Integer);
+begin
+  FInternal.WillReturn(Value);
+end;
 
 end.

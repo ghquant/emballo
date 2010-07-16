@@ -1,4 +1,4 @@
-unit Emballo.Mock.MockImplTests;
+unit Emballo.Mock.MockTests;
 
 interface
 
@@ -17,12 +17,14 @@ type
   ETestException = class(Exception)
   end;
 
-  TMockImplTests = class(TTestCase)
+  TMockTests = class(TTestCase)
   private
-    FMock: IMock<TMocked>;
+    FMock: TMock<TMocked>;
   protected
     procedure SetUp; override;
     procedure TearDown; override;
+  public
+    destructor Destroy; override;
   published
     procedure ShouldFailOnUnexpectedCalls;
     procedure ExpectedCallShouldNotFail;
@@ -35,18 +37,24 @@ type
 implementation
 
 uses
-  Emballo.Mock.MockImpl;
+  Emballo.Mock.UnexpectedUsage;
 
-{ TMockImplTests }
+{ TMockTests }
 
-procedure TMockImplTests.ExpectedCallShouldNotFail;
+destructor TMockTests.Destroy;
+begin
+  FMock.Free;
+  inherited;
+end;
+
+procedure TMockTests.ExpectedCallShouldNotFail;
 begin
   FMock.Expects.Foo;
 
   FMock.GetObject.Foo;
 end;
 
-procedure TMockImplTests.MethodShouldReturnSpecifiedValue;
+procedure TMockTests.MethodShouldReturnSpecifiedValue;
 var
   ReturnValue: Integer;
 begin
@@ -58,13 +66,13 @@ begin
   CheckEquals(10, ReturnValue, 'Mocked method should return the specified value');
 end;
 
-procedure TMockImplTests.SetUp;
+procedure TMockTests.SetUp;
 begin
   inherited;
   FMock := TMock<TMocked>.Create;
 end;
 
-procedure TMockImplTests.ShouldFailOnUnexpectedCalls;
+procedure TMockTests.ShouldFailOnUnexpectedCalls;
 begin
   try
     FMock.GetObject.Foo;
@@ -74,7 +82,7 @@ begin
   end;
 end;
 
-procedure TMockImplTests.ShouldRaiseConfiguredException;
+procedure TMockTests.ShouldRaiseConfiguredException;
 begin
   FMock.Expects.Foo;
   FMock.WillRaise(ETestException);
@@ -87,13 +95,13 @@ begin
   end;
 end;
 
-procedure TMockImplTests.TearDown;
+procedure TMockTests.TearDown;
 begin
   inherited;
-  FMock := Nil;
+
 end;
 
-procedure TMockImplTests.VerifyUsageMustFailIfUsageWasNotAsExpected;
+procedure TMockTests.VerifyUsageMustFailIfUsageWasNotAsExpected;
 begin
   FMock.Expects.Foo;
 
@@ -105,7 +113,7 @@ begin
   end;
 end;
 
-procedure TMockImplTests.VerifyUsageMustNotFailIfUsageWasAsExpected;
+procedure TMockTests.VerifyUsageMustNotFailIfUsageWasAsExpected;
 begin
   FMock.Expects.Foo;
 
@@ -126,6 +134,6 @@ begin
 end;
 
 initialization
-RegisterTest('Emballo.Mock', TMockImplTests.Suite);
+RegisterTest('Emballo.Mock', TMockTests.Suite);
 
 end.

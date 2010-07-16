@@ -109,7 +109,6 @@ var
   DelegateFactory: IDelegateFactory;
   PoolFactory: IFactory;
   Instance1: ITestService;
-  WeakInstance1: Pointer;
   Instance2: ITestService;
   Destroyed: Boolean;
   Tmp: IInterface;
@@ -124,8 +123,6 @@ begin
   Tmp := PoolFactory.GetInstance;
   Supports(Tmp, ITestService, Instance1);
   Tmp := Nil;
-
-  WeakInstance1 := Pointer(Instance1);
 
   Tmp := PoolFactory.GetInstance;
   Supports(Tmp, ITestService, Instance2);

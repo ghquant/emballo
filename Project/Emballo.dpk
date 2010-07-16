@@ -80,7 +80,7 @@ contains
   Emballo.TypeWrappers in '..\Src\Emballo.TypeWrappers.pas',
   Emballo.Mock.MockService in '..\Src\Emballo.Mock.MockService.pas',
   Emballo.Mock.Mock in '..\Src\Emballo.Mock.Mock.pas',
-  Emballo.Mock.MockImpl in '..\Src\Emballo.Mock.MockImpl.pas',
+  Emballo.Mock.MockInternalImpl in '..\Src\Emballo.Mock.MockInternalImpl.pas',
   Emballo.DynamicProxy.DynamicProxyService in '..\Src\Emballo.DynamicProxy.DynamicProxyService.pas',
   Emballo.SynteticClass in '..\Src\Emballo.SynteticClass.pas',
   Emballo.DynamicProxy.MethodImpl in '..\Src\Emballo.DynamicProxy.MethodImpl.pas',
@@ -90,6 +90,8 @@ contains
   Emballo.Mock.RaiseExceptionClassMethodAction in '..\Src\Emballo.Mock.RaiseExceptionClassMethodAction.pas',
   Emballo.General in '..\Src\Emballo.General.pas',
   Emballo.Mock.ReturnValueMethodAction in '..\Src\Emballo.Mock.ReturnValueMethodAction.pas',
-  Emballo.DynamicProxy.InterfaceProxy in '..\Src\Emballo.DynamicProxy.InterfaceProxy.pas';
+  Emballo.DynamicProxy.InterfaceProxy in '..\Src\Emballo.DynamicProxy.InterfaceProxy.pas',
+  Emballo.Mock.MockInternal in '..\Src\Emballo.Mock.MockInternal.pas',
+  Emballo.Mock.UnexpectedUsage in '..\Src\Emballo.Mock.UnexpectedUsage.pas';
 
 end.

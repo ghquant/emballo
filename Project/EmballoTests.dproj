@@ -68,7 +68,7 @@
 			<DCCReference Include="..\Tests\Emballo.Hash.Md5AlgorithmTests.pas"/>
 			<DCCReference Include="..\Tests\Emballo.DynamicProxy.MethodImplTests.pas"/>
 			<DCCReference Include="..\Tests\Emballo.SynteticClassTests.pas"/>
-			<DCCReference Include="..\Tests\Emballo.Mock.MockImplTests.pas"/>
+			<DCCReference Include="..\Tests\Emballo.Mock.MockTests.pas"/>
 			<DCCReference Include="..\Tests\Emballo.DynamicProxy.InterfaceProxyTests.pas"/>
 			<BuildConfiguration Include="Base">
 				<Key>Base</Key>

@@ -16,33 +16,30 @@
     License along with Emballo.
     If not, see <http://www.gnu.org/licenses/>. }
 
-unit Emballo.Mock.MockService;
+unit Emballo.Mock.MockInternal;
 
 interface
 
 uses
-  Emballo.Mock.Mock;
+  SysUtils;
 
 type
-  TMockService = class
-  public
-    function Get<T:class>: TMock<T>;
+  TExceptionClass = class of Exception;
+
+  IMockInternal<T:class> = interface
+    ['{34CB781C-7C84-47A7-B829-35D3AA6DE766}']
+
+    function GetObject: T;
+
+    function Expects: T;
+
+    procedure VerifyUsage;
+
+    procedure WillRaise(ExceptionClass: TExceptionClass);
+
+    procedure WillReturn(const Value: Integer);
   end;
 
-function MockService: TMockService;
-
 implementation
-
-function MockService: TMockService;
-begin
-  Result := Nil;
-end;
-
-{ TMockService }
-
-function TMockService.Get<T>: TMock<T>;
-begin
-  Result := TMock<T>.Create;
-end;
 
 end.

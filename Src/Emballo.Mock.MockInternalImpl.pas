@@ -16,7 +16,7 @@
     License along with Emballo.
     If not, see <http://www.gnu.org/licenses/>. }
 
-unit Emballo.Mock.MockImpl;
+unit Emballo.Mock.MockInternalImpl;
 
 interface
 
@@ -26,12 +26,12 @@ uses
   Generics.Collections,
   Emballo.General,
   Emballo.Mock.ExpectedMethodCall,
-  Emballo.Mock.Mock;
+  Emballo.Mock.MockInternal;
 
 type
   TMockState = (msCheckingUsage, msWaitingExpectation);
 
-  TMock<T:class> = class(TInterfacedObject, IMock<T>)
+  TMockInternal<T:class> = class(TInterfacedObject, IMockInternal<T>)
   private
     FObject: T;
     FState: TMockState;
@@ -52,12 +52,15 @@ implementation
 uses
   Emballo.DynamicProxy.DynamicProxyService,
   Emballo.DynamicProxy.InvokationHandler,
-  Rtti, Emballo.Mock.DummyMethodAction, Emballo.Mock.RaiseExceptionClassMethodAction,
+  Rtti,
+  Emballo.Mock.DummyMethodAction,
+  Emballo.Mock.UnexpectedUsage,
+  Emballo.Mock.RaiseExceptionClassMethodAction,
   Emballo.Mock.ReturnValueMethodAction;
 
-{ TMock<T> }
+{ TMockInternal<T> }
 
-constructor TMock<T>.Create;
+constructor TMockInternal<T>.Create;
 var
   InvokationHandler: TInvokationHandlerAnonMethod;
 begin
@@ -91,7 +94,7 @@ begin
   FObject := DynamicProxyService.Get<T>(InvokationHandler);
 end;
 
-destructor TMock<T>.Destroy;
+destructor TMockInternal<T>.Destroy;
 var
   O: TExpectedMethodCall;
 begin
@@ -102,29 +105,29 @@ begin
   inherited;
 end;
 
-function TMock<T>.Expects: T;
+function TMockInternal<T>.Expects: T;
 begin
   Result := FObject;
   FState := msWaitingExpectation;
 end;
 
-function TMock<T>.GetObject: T;
+function TMockInternal<T>.GetObject: T;
 begin
   Result := FObject;
 end;
 
-procedure TMock<T>.VerifyUsage;
+procedure TMockInternal<T>.VerifyUsage;
 begin
   if FExpectedCalls.Count > 0 then
     raise EUnexpectedUsage.Create('Expected calls didn''t happen');
 end;
 
-procedure TMock<T>.WillRaise(ExceptionClass: TExceptionClass);
+procedure TMockInternal<T>.WillRaise(ExceptionClass: TExceptionClass);
 begin
   FCurrentExpectation.Action := TRaiseExceptionClassMethodAction.Create(ExceptionClass);
 end;
 
-procedure TMock<T>.WillReturn(const Value: Integer);
+procedure TMockInternal<T>.WillReturn(const Value: Integer);
 begin
   FCurrentExpectation.Action := TReturnValueMethodAction<Integer>.Create(Value);
 end;
