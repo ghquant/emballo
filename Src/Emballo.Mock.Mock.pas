@@ -37,6 +37,7 @@ type
     procedure WillReturn(const Value: Integer);
     class function Create: TMock<T>; static;
     procedure Free;
+    class operator Implicit(const Value: TMock<T>): T;
   end;
 
 implementation
@@ -64,6 +65,11 @@ end;
 function TMock<T>.GetObject: T;
 begin
   Result := FInternal.GetObject;
+end;
+
+class operator TMock<T>.Implicit(const Value: TMock<T>): T;
+begin
+  Result := Value.GetObject;
 end;
 
 procedure TMock<T>.VerifyUsage;

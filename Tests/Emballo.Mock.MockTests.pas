@@ -23,8 +23,6 @@ type
   protected
     procedure SetUp; override;
     procedure TearDown; override;
-  public
-    destructor Destroy; override;
   published
     procedure ShouldFailOnUnexpectedCalls;
     procedure ExpectedCallShouldNotFail;
@@ -32,6 +30,7 @@ type
     procedure VerifyUsageMustFailIfUsageWasNotAsExpected;
     procedure VerifyUsageMustNotFailIfUsageWasAsExpected;
     procedure MethodShouldReturnSpecifiedValue;
+    procedure ShouldBeAbleToCastTheMockToTheMockedType;
   end;
 
 implementation
@@ -40,12 +39,6 @@ uses
   Emballo.Mock.UnexpectedUsage;
 
 { TMockTests }
-
-destructor TMockTests.Destroy;
-begin
-  FMock.Free;
-  inherited;
-end;
 
 procedure TMockTests.ExpectedCallShouldNotFail;
 begin
@@ -70,6 +63,14 @@ procedure TMockTests.SetUp;
 begin
   inherited;
   FMock := TMock<TMocked>.Create;
+end;
+
+procedure TMockTests.ShouldBeAbleToCastTheMockToTheMockedType;
+var
+  Mocked: TMocked;
+begin
+  Mocked := FMock;
+  CheckTrue(Mocked = FMock.GetObject);
 end;
 
 procedure TMockTests.ShouldFailOnUnexpectedCalls;
