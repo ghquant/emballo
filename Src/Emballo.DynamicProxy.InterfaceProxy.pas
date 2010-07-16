@@ -37,8 +37,6 @@ type
     FRttiContext: TRttiContext;
     FHelper: TDynamicInterfaceHelper;
     FGuid: TGUID;
-    FInstance: TObject;
-    FPointerToVTable: Pointer;
     function GetVTable: Pointer;
     procedure GenerateStub(const AsmBlock: TAsmBlock; const CallingConvention: TCallConv;
       const MethodAddress: Pointer; const Offset: Integer);
@@ -65,12 +63,10 @@ constructor TInterfaceProxy.Create(const Instance: TObject; const AddRef, QueryI
   const InvokationHandler: TInvokationHandlerAnonMethod; Offset: Integer);
 var
   RttiType: TRttiType;
-  Method: TRttiMethod;
   i: Integer;
   Methods: TArray<TRttiMethod>;
   MethodAddresses: array of Pointer;
 begin
-  GetMem(FPointerToVTable, SizeOf(Pointer));
   FRttiContext := TRttiContext.Create;
   RttiType := FRttiContext.GetType(InterfaceTypeInfo);
   FGuid := (RttiType as TRttiInterfaceType).GUID;
@@ -99,15 +95,12 @@ begin
     FInterfaceStubs[i].Compile;
     FStubsAddresses[i] := FInterfaceStubs[i].Block;
   end;
-
-  PPointer(FPointerToVTable)^ := @FStubsAddresses[0];
 end;
 
 destructor TInterfaceProxy.Destroy;
 var
   i: Integer;
 begin
-  FreeMem(FPointerToVTable);
   for i := 0 to High(FInterfaceStubs) do
     FInterfaceStubs[i].Free;
 

@@ -158,7 +158,6 @@ function TPoolFactory.HackedRelease(Obj: TObject): Integer;
 var
   OriginalRelease: function: Integer of object; stdcall;
   Intf: Pointer;
-  Intf2: Pointer;
 begin
   { Set up a method pointer so that we can call the original Release method }
   TMethod(OriginalRelease).Code := FOriginalRelease;

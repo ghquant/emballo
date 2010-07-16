@@ -54,8 +54,6 @@ type
   private
     FValue: Integer;
     FHasValueTag: String;
-    FChangeEvents: IChangeEventsManager<Integer>;
-    procedure InitChangeEvents;
     procedure SetValue(Value: Integer);
     function GetIsNull: Boolean;
   public
@@ -89,12 +87,6 @@ end;
 class operator TIntegerWrapper.Implicit(Value: TIntegerWrapper): Integer;
 begin
   Result := Value.Value;
-end;
-
-procedure TIntegerWrapper.InitChangeEvents;
-begin
-  if not Assigned(FChangeEvents) then
-    FChangeEvents := TChangeEventsManager<Integer>.Create;
 end;
 
 procedure TIntegerWrapper.SetValue(Value: Integer);

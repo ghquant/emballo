@@ -75,11 +75,7 @@ type
 constructor TDynamicProxy.Create(const ParentClass: TClass;
   ImplementedInterfaces: TArray<PTypeInfo>; InvokationHandler: TInvokationHandlerAnonMethod);
 var
-  InterfaceType: TRttiInterfaceType;
-  Methods: TArray<TRttiMethod>;
-  Method: TRttiMethod;
   i: Integer;
-  MethodPointers: TArray<Pointer>;
   LParentClass: TClass;
   Instantiator: TInstantiator;
   ImplementedInterfacesGuids: TArray<TGUID>;
@@ -104,13 +100,6 @@ begin
 
   FSynteticClass := TSynteticClass.Create(LParentClass.ClassName, LParentClass,
     SizeOf(Pointer), ImplementedInterfacesGuids, True);
-  FSynteticClass.Finalizer := procedure(const Instance: TObject)
-  var
-    DynamicProxy: TDynamicProxy;
-  begin
-    DynamicProxy := TObject(GetAditionalData(Instance)^) as TDynamicProxy;
-//    DynamicProxy.Free;
-  end;
 
   Instantiator := TInstantiator.Create;
   try
@@ -170,7 +159,6 @@ begin
 
   FNewDestroy.Free;
 
-
   FRttiContext.Free;
   inherited;
 end;
@@ -229,8 +217,6 @@ begin
 end;
 
 function TDynamicProxy.QueryInterface(const IID: TGUID; out Obj): HRESULT;
-var
-  i: Integer;
 begin
   if GetInterface(IID, Obj) then
     Result := 0
