@@ -30,15 +30,26 @@ type
       var E: String); virtual; abstract;
   end;
 
+  {$M+}
+  ITestInterface = interface
+    ['{CC2E979B-2ACF-43AA-BEF2-536DCCA1A7A5}']
+    procedure Foo;
+  end;
+  {$M-}
+
   TDynamicProxyTests = class(TTestCase)
   published
     procedure InvokationHandlerShouldBeCalled;
+    procedure TestInterfaceProxy;
+    procedure VerifyCanCallInterfaceMethods;
   end;
 
 implementation
 
 uses
   Rtti,
+  TypInfo,
+  SysUtils,
   Emballo.DynamicProxy.InvokationHandler,
   Emballo.DynamicProxy.Impl;
 
@@ -71,6 +82,47 @@ begin
   finally
     Test.Free;
   end;
+end;
+
+procedure TDynamicProxyTests.TestInterfaceProxy;
+var
+  P: TDynamicProxy;
+  Intf: TArray<PTypeInfo>;
+  InvokationHandler: TInvokationHandlerAnonMethod;
+  TestInterface: ITestInterface;
+begin
+  InvokationHandler := procedure(const Method: TRttiMethod;
+    const Parameters: TArray<IParameter>; const Result: IParameter)
+    begin
+    end;
+
+  SetLength(Intf, 1);
+  Intf[0] := TypeInfo(ITestInterface);
+  P := TDynamicProxy.Create(Nil, Intf, InvokationHandler);
+  P.ProxyObject.GetInterface(ITestInterface, TestInterface);
+
+  CheckTrue(Supports(P.ProxyObject, ITestInterface), 'The returned proxy should support the required interfaces');
+
+  TestInterface := Nil;
+end;
+
+procedure TDynamicProxyTests.VerifyCanCallInterfaceMethods;
+var
+  P: TDynamicProxy;
+  Intf: TArray<PTypeInfo>;
+  InvokationHandler: TInvokationHandlerAnonMethod;
+  TestInterface: ITestInterface;
+begin
+  InvokationHandler := procedure(const Method: TRttiMethod;
+    const Parameters: TArray<IParameter>; const Result: IParameter)
+    begin
+    end;
+
+  SetLength(Intf, 1);
+  Intf[0] := TypeInfo(ITestInterface);
+  P := TDynamicProxy.Create(Nil, Intf, InvokationHandler);
+  Supports(P.ProxyObject, ITestInterface, TestInterface);
+  TestInterface.Foo;
 end;
 
 initialization

@@ -133,12 +133,12 @@ end;
 
 function TTestClass.DoubleResultRegisterCallingConvention: Double;
 begin
-
+  Result := 0;
 end;
 
 function TTestClass.IntegerResultRegisterCallingConvention: Integer;
 begin
-
+  Result := 0;
 end;
 
 initialization

@@ -49,7 +49,8 @@ uses
   Emballo.Hash.Md5AlgorithmTests in '..\Tests\Emballo.Hash.Md5AlgorithmTests.pas',
   Emballo.DynamicProxy.MethodImplTests in '..\Tests\Emballo.DynamicProxy.MethodImplTests.pas',
   Emballo.SynteticClassTests in '..\Tests\Emballo.SynteticClassTests.pas',
-  Emballo.Mock.MockImplTests in '..\Tests\Emballo.Mock.MockImplTests.pas';
+  Emballo.Mock.MockImplTests in '..\Tests\Emballo.Mock.MockImplTests.pas',
+  Emballo.DynamicProxy.InterfaceProxyTests in '..\Tests\Emballo.DynamicProxy.InterfaceProxyTests.pas';
 
 {$R *.RES}
 

@@ -78,8 +78,6 @@ begin
   InvokedFactory := False;
   Instance := PoolFactory.GetInstance;
   CheckFalse(InvokedFactory, 'There''s one available object on the pool, so the factory must return it');
-
-  Instance := Nil;
 end;
 
 procedure TPoolFactoryTests.TestDontFreeWhenReturnToPool;
@@ -122,6 +120,7 @@ begin
   begin
     Result := TTestService.Create;
   end);
+
   Tmp := PoolFactory.GetInstance;
   Supports(Tmp, ITestService, Instance1);
   Tmp := Nil;
@@ -140,7 +139,6 @@ begin
 
   Instance2 := Nil;
   Instance1 := Nil;
-  ITestService(WeakInstance1).SetDestroyEvent(Nil);
   CheckTrue(Destroyed, 'Releasing an interface when the pool is full should make the interface to be Free''d immediately');
 end;
 

@@ -246,13 +246,13 @@ begin
     end
     else
       raise ENotAnInterface.Create;
+
+    FDynamicInterfaceHelper := TDynamicInterfaceHelper.Create(TRttiInterfaceType(RttiType).GUID,
+      @TEbInterfacedObject.QueryInterface, @TDllWrapper._AddRef, @TDllWrapper._Release,
+      Self, MethodPointers, 0);
   finally
     Ctx.Free;
   end;
-
-  FDynamicInterfaceHelper := TDynamicInterfaceHelper.Create(TRttiInterfaceType(RttiType).GUID,
-    @TEbInterfacedObject.QueryInterface, @TDllWrapper._AddRef, @TDllWrapper._Release,
-    Self, MethodPointers);
 end;
 
 destructor TDllWrapper.Destroy;

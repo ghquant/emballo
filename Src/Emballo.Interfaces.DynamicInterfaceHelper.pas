@@ -41,7 +41,10 @@ type
 
     FInterface: Pointer;
 
+    FOffset: Integer;
+
     procedure BuildStub(Block: TAsmBlock; Destination: Pointer);
+    function GetVTable: Pointer;
   public
     { GUID is the identifier of the dynamically implemented interface,
       QueryInterfaceAddress, AddRefAddress and ReleaseAddress are the
@@ -52,10 +55,12 @@ type
       Instance is the instance of the object that will be dynamically
       implementing the interface }
     constructor Create(GUID: TGUID; QueryInterfaceAddress, AddRefAddress,
-      ReleaseAddress, Instance: Pointer; MethodsAddresses: array of Pointer);
+      ReleaseAddress, Instance: Pointer; MethodsAddresses: array of Pointer; Offset: Integer);
     destructor Destroy; override;
 
     function QueryInterface(IID: TGUID; out Obj): HRESULT; stdcall;
+
+    property VTable: Pointer read GetVTable;
   end;
 
 implementation
@@ -84,9 +89,11 @@ end;
 
 constructor TDynamicInterfaceHelper.Create(GUID: TGUID; QueryInterfaceAddress,
   AddRefAddress, ReleaseAddress, Instance: Pointer;
-  MethodsAddresses: array of Pointer);
+  MethodsAddresses: array of Pointer; Offset: Integer);
 begin
   FInstance := Instance;
+
+  FOffset := Offset;
 
   GetMem(FInterface, SizeOf(Pointer));
 
@@ -122,6 +129,11 @@ begin
   FReleaseStub.Free;
   FreeMem(FInterface);
   inherited;
+end;
+
+function TDynamicInterfaceHelper.GetVTable: Pointer;
+begin
+  Result := @FMethods[0];
 end;
 
 function TDynamicInterfaceHelper.QueryInterface(IID: TGUID; out Obj): HRESULT;

@@ -38,19 +38,19 @@ type
   TDestroy           = procedure (OuterMost: ShortInt) of object;
   TObjectVirtualMethods = packed record
     A, B, C: Pointer;
-    SafeCallException : PSafeCallException;
-    AfterConstruction : PAfterConstruction;
-    BeforeDestruction : PBeforeDestruction;
-    Dispatch          : PDispatch;
-    DefaultHandler    : PDefaultHandler;
-    NewInstance       : PNewInstance;
-    FreeInstance      : PFreeInstance;
+    SafeCallException : Pointer;
+    AfterConstruction : Pointer;
+    BeforeDestruction : Pointer;
+    Dispatch          : Pointer;
+    DefaultHandler    : Pointer;
+    NewInstance       : Pointer;
+    FreeInstance      : Pointer;
     Destroy           : Pointer;
   end;
   PClassRec = ^TClassRec;
   TClassRec = packed record
     SelfPtr           : TClass;
-    IntfTable         : Pointer;
+    IntfTable         : PInterfaceTable;
     AutoTable         : Pointer;
     InitTable         : Pointer;
     TypeInfo          : Pointer;
@@ -82,6 +82,7 @@ type
     FFinalizer: TInstanceFinalizer;
     FOldDestroy: Pointer;
     FNewDestroy: TAsmBlock;
+    FFreeOnInstanceDestroy: Boolean;
     function GetMetaclass: TClass;
     function GetVirtualMethodAddress(const Index: Integer): Pointer;
     procedure SetVirtualMethodAddress(const Index: Integer; const Value: Pointer);
@@ -90,7 +91,8 @@ type
     procedure NewDestroy(Instance: TObject; OuterMost: ShortInt);
   public
     constructor Create(const ClassName: ShortString; const Parent: TClass;
-      const AditionalInstanceSize: Integer);
+      const AditionalInstanceSize: Integer; const ImplementedInterfaces: TArray<TGUID>;
+      const FreeOnInstanceDestroy: Boolean);
     destructor Destroy; override;
 
     { Returns the new metaclass }
@@ -120,10 +122,23 @@ begin
 end;
 
 function GetAditionalData(const Instance: TObject): Pointer;
+var
+  Address: Integer;
 begin
+  Address := Integer(Instance);
+  Address := Address + Instance.InstanceSize;
+
   { RTL considers an implicit TMonitor field as the last field on the object }
-  Result := Pointer(Integer(Instance) + Instance.InstanceSize -
-    GetAditionalInstanceSize(Instance.ClassType) - SizeOf(Pointer));
+  Address := Address - SizeOf(Pointer);
+
+  Address := Address - GetAditionalInstanceSize(Instance.ClassType);
+
+  { Take into account a pointer to each implemented interface }
+  if Instance.ClassType.GetInterfaceTable <> Nil then
+    Address := Address - Instance.ClassType.GetInterfaceTable.EntryCount*SizeOf(Pointer);
+
+
+  Result := Pointer(Address);
 end;
 
 procedure SetAditionalData(const Instance: TObject; const Data);
@@ -134,12 +149,15 @@ end;
 { TSynteticClass }
 
 constructor TSynteticClass.Create(const ClassName: ShortString; const Parent: TClass;
-  const AditionalInstanceSize: Integer);
+  const AditionalInstanceSize: Integer; const ImplementedInterfaces: TArray<TGUID>;
+  const FreeOnInstanceDestroy: Boolean);
 var
   ParentClassRec: PClassRec;
   VmtEntries: TArray<TVmtEntry>;
   NumVmtEntries: Integer;
+  i: Integer;
 begin
+  FFreeOnInstanceDestroy := FreeOnInstanceDestroy;
   VmtEntries := EnumerateVirtualMethods(Parent);
   NumVmtEntries := VmtEntries[High(VmtEntries)].Index + 1;
 
@@ -155,12 +173,26 @@ begin
   Move(ParentClassRec^, FClassRec.ClassRec, SizeOf(TClassRec));
   GetMem(FClassRec.ClassRec.Parent, SizeOf(Pointer));
   FClassRec.ClassRec.ClassName := @FClassName;
-  FClassRec.ClassRec.InstanceSize := Parent.InstanceSize + AditionalInstanceSize;
+  FClassRec.ClassRec.InstanceSize := Parent.InstanceSize + AditionalInstanceSize +
+    Length(ImplementedInterfaces)*SizeOf(Pointer);
   Pointer(FClassRec.ClassRec.Parent^) := Parent;
 
   FOldDestroy := FClassRec.ClassRec.DefaultVirtualMethods.Destroy;
   CreateNewDestroy;
   FClassRec.ClassRec.DefaultVirtualMethods.Destroy := FNewDestroy.Block;
+
+  if Length(ImplementedInterfaces) > 0 then
+  begin
+    GetMem(FClassRec.ClassRec.IntfTable, SizeOf(Integer) + Length(ImplementedInterfaces)*SizeOf(TInterfaceEntry));
+    FClassRec.ClassRec.IntfTable.EntryCount := Length(ImplementedInterfaces);
+    for i := 0 to High(ImplementedInterfaces) do
+    begin
+      FClassRec.ClassRec.IntfTable.Entries[i].IID := ImplementedInterfaces[i];
+      FClassRec.ClassRec.IntfTable.Entries[i].IOffset := Parent.InstanceSize - SizeOf(Pointer) + i*SizeOf(Pointer) + AditionalInstanceSize;
+    end;
+  end
+  else
+    FClassRec.ClassRec.IntfTable := Nil;
 end;
 
 procedure TSynteticClass.CreateNewDestroy;
@@ -190,6 +222,8 @@ destructor TSynteticClass.Destroy;
 begin
   FNewDestroy.Free;
   FreeMem(FClassRec.ClassRec.Parent);
+  if Assigned(FClassRec.ClassRec.IntfTable) then
+    FreeMem(FClassRec.ClassRec.IntfTable);
   FreeMem(FClassRec);
   inherited;
 end;
@@ -234,8 +268,12 @@ begin
 end;
 
 function TSynteticClass.GetVirtualMethodAddress(const Index: Integer): Pointer;
+var
+  Vmt: PPointer;
 begin
-
+  Vmt := PPointer(@FClassRec.ClassRec.DefaultVirtualMethods);
+  Inc(Vmt, Index + 11);
+  Result := Vmt^;
 end;
 
 procedure TSynteticClass.NewDestroy(Instance: TObject; OuterMost: ShortInt);
@@ -251,6 +289,9 @@ begin
     Finalizer(Instance);
 
   OldDestroy(OuterMost);
+
+  if FFreeOnInstanceDestroy then
+    Free;
 end;
 
 procedure TSynteticClass.SetVirtualMethodAddress(const Index: Integer;

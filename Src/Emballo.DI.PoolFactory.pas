@@ -77,7 +77,10 @@ type
 implementation
 
 uses
-  Windows, SysUtils;
+  Rtti,
+  SysUtils,
+  Windows,
+  Emballo.Rtti;
 
 type
   TArrayOfPointer = array[0..(MAXINT div SizeOf(Pointer)) - 1] of Pointer;
@@ -96,7 +99,7 @@ begin
   FMax := Max;
   FPool := TInterfaceList.Create;
   FUnavailable := TList.Create; { It MUST be a list of raw pointers because we
-    need fine controu about ref. couting. This is to avoid automatic ref.
+    need fine control about ref. couting. This is to avoid automatic ref.
     couting when we're inside our HackedRelease method, as this would cause an
     infinite loop. We do the ref. counting manually by calling the original
     release method when appropriated }
@@ -105,8 +108,8 @@ end;
 destructor TPoolFactory.Destroy;
 var
   StubPatch: TStubPatch;
+  i: Integer;
 begin
-  FUnavailable.Free;
   if FPatchedInterface then
   begin
     for StubPatch in FStubPatches do
@@ -117,7 +120,16 @@ begin
   end;
   FStubPatches.Free;
 
+  { Before freeing the FUnavailable, we have to decrease the RefCount of each of it's
+    elements. But that must be done after unpatching the Release methods, because
+    otherwise refcount could reach one and the objects would be Free'd while there are
+    live references outside TPoolFactory }
+  for i := 0 to FUnavailable.Count - 1 do
+    IInterface(FUnavailable[i])._Release;
+  FUnavailable.Free;
+
   FPool := Nil;
+
   inherited;
 end;
 
@@ -146,36 +158,48 @@ function TPoolFactory.HackedRelease(Obj: TObject): Integer;
 var
   OriginalRelease: function: Integer of object; stdcall;
   Intf: Pointer;
-  Intf2: IInterface;
+  Intf2: Pointer;
 begin
+  { Set up a method pointer so that we can call the original Release method }
   TMethod(OriginalRelease).Code := FOriginalRelease;
   TMethod(OriginalRelease).Data := Obj;
   Result := OriginalRelease;
 
+  { Now we get the IInterface reference for the object }
+  Obj.GetInterface(IInterface, Intf);
+
+  { The above call generated an _AddRef. So, we undo it here }
+  OriginalRelease;
+
+  { If the object isn't on the unavailable list, it is not managed by the pool, so ther's
+    nothing more to do here }
+  if FUnavailable.IndexOf(Intf) = -1 then
+    Exit;
+
+
   if Result = 1 then
   begin
     { When ref. count reaches one, it means that the only remaining
-      reference is the one stored on FUnavailable. In other words: The object
+      reference is the one stored on FUnavailable. In other words: The object is
       not in use anymore, and can now return to the pool or be freed }
-
-    Supports(Obj, IInterface, Intf);
-    { The Supports() above addref'd the object, so we undo this now }
-    OriginalRelease;
 
     if FPool.Count < FMax then
     begin
       { If there's free space on the pool, then return the object to the pool }
-      Supports(Obj, IInterface, Intf2);
-      FPool.Add(Intf2);
-      Intf2 := Nil;
-      FUnavailable.Remove(Obj);
+      FPool.Add(IInterface(Intf));
+
+      FUnavailable.Remove(Intf);
       { As we removed from FUnavailable, now decrease the ref. count }
       OriginalRelease;
     end
     else
     begin
       { The pool is full. So, we'll really free the object. For that, we call
-        the original Release method once again }
+        the original Release method once again. But before, we remove it from
+        the list of unavailable objects }
+//      Supports(Obj, IInterface, Intf);
+      FUnavailable.Remove(Intf);
+//      OriginalRelease;
       OriginalRelease;
     end;
   end;

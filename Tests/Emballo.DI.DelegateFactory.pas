@@ -21,6 +21,7 @@ unit Emballo.DI.DelegateFactory;
 interface
 
 uses
+  Emballo.DI.Factory,
   Emballo.DI.AbstractFactory;
 
 type
@@ -31,17 +32,26 @@ type
     procedure SetGetInstance(Value: TGetInstance);
   end;
 
-  TDelegateFactory = class(TAbstractFactory, IDelegateFactory)
+  TDelegateFactory = class(TAbstractFactory, IDelegateFactory, IFactory)
   private
-    FGetInstance: TGetInstance;
+
     procedure SetGetInstance(Value: TGetInstance);
   protected
     function GetInstance: IInterface; override;
+  public
+    FGetInstance: TGetInstance;
+    destructor Destroy; override;
   end;
 
 implementation
 
 { TDelegateFactory }
+
+destructor TDelegateFactory.Destroy;
+begin
+  FGetInstance := Nil;
+  inherited;
+end;
 
 function TDelegateFactory.GetInstance: IInterface;
 begin

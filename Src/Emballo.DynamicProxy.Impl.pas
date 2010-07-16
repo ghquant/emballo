@@ -23,8 +23,8 @@ interface
 uses
   Rtti,
   TypInfo,
-  Emballo.Interfaces.DynamicInterfaceHelper,
   Emballo.Interfaces.InterfacedObject,
+  Emballo.DynamicProxy.InterfaceProxy,
   Emballo.DynamicProxy.InvokationHandler,
   Emballo.DynamicProxy.MethodImpl,
   Emballo.RuntimeCodeGeneration.AsmBlock,
@@ -38,8 +38,12 @@ type
     FRttiContext: TRttiContext;
     FSynteticClass: TSynteticClass;
     FParentClassVirtualMethods: TArray<TMethodImpl>;
-    FDynamicInterfaceHelper: TDynamicInterfaceHelper;
     FProxyObject: TObject;
+    FSupportedInterfaces: TArray<TInterfaceProxy>;
+    FNewDestroy: TAsmBlock;
+    FOriginalDestroy: Pointer;
+    procedure NewDestroy(Instance: TObject; Outermost: SmallInt);
+    procedure GenerateNewDestroy;
     procedure OverrideVirtualMethods(const ParentClass: TClass);
   protected
     function QueryInterface(const IID: TGUID; out Obj): HRESULT; override; stdcall;
@@ -58,7 +62,13 @@ uses
   SysUtils,
   Emballo.DI.AbstractFactory,
   Emballo.DynamicProxy.InvokationHandler.ParameterImpl,
-  Emballo.RuntimeCodeGeneration.CallingConventions;
+  Emballo.RuntimeCodeGeneration.CallingConventions,
+  Emballo.Rtti;
+
+type
+  TInterfacedObjectHack = class(TInterfacedObject)
+
+  end;
 
 { TDynamicProxy }
 
@@ -72,24 +82,34 @@ var
   MethodPointers: TArray<Pointer>;
   LParentClass: TClass;
   Instantiator: TInstantiator;
+  ImplementedInterfacesGuids: TArray<TGUID>;
+  IOffset: Integer;
+  VTable: Pointer;
+  MethodDestroy: TRttiMethod;
 begin
   FRttiContext := TRttiContext.Create;
   FInvokationHandler := InvokationHandler;
 
   if Assigned(ParentClass) then
     LParentClass := ParentClass
+  else if Length(ImplementedInterfaces) = 0 then
+    LParentClass := TObject
   else
-    LParentClass := TObject;
+    LParentClass := TInterfacedObject;
+
+  SetLength(ImplementedInterfacesGuids, Length(ImplementedInterfaces));
+  for i := 0 to High(ImplementedInterfaces) do
+    ImplementedInterfacesGuids[i] := GetGuidFromTypeInfo(ImplementedInterfaces[i]);
 
 
   FSynteticClass := TSynteticClass.Create(LParentClass.ClassName, LParentClass,
-    SizeOf(Pointer));
+    SizeOf(Pointer), ImplementedInterfacesGuids, True);
   FSynteticClass.Finalizer := procedure(const Instance: TObject)
   var
     DynamicProxy: TDynamicProxy;
   begin
     DynamicProxy := TObject(GetAditionalData(Instance)^) as TDynamicProxy;
-    DynamicProxy.Free;
+//    DynamicProxy.Free;
   end;
 
   Instantiator := TInstantiator.Create;
@@ -101,29 +121,30 @@ begin
 
   SetAditionalData(FProxyObject, Self);
 
-  OverrideVirtualMethods(ParentClass);
+  OverrideVirtualMethods(LParentClass);
 
-{  InterfaceType := FRttiContext.GetType(InterfaceTypeInfo) as TRttiInterfaceType;
+  MethodDestroy := FRttiContext.GetType(LParentClass).GetMethod('Destroy');
+  FOriginalDestroy := FSynteticClass.VirtualMethodAddress[MethodDestroy.VirtualIndex];
 
-  Methods := InterfaceType.GetMethods;
-  SetLength(MethodPointers, Length(Methods));
-  SetLength(FMethodStubs, Length(Methods));
-  for i := 0 to High(Methods) do
+  GenerateNewDestroy;
+
+  FSynteticClass.VirtualMethodAddress[MethodDestroy.VirtualIndex] := FNewDestroy.Block;
+
+  SetLength(FSupportedInterfaces, Length(ImplementedInterfaces));
+  for i := 0 to High(ImplementedInterfaces) do
   begin
-    Method := Methods[i];
+    IOffset := FSynteticClass.Metaclass.GetInterfaceTable.Entries[i].IOffset;
 
-    FMethodStubs[i] := TStdCallMethodStub.Create(Method, FInvokationHandler);
+    FSupportedInterfaces[i] := TInterfaceProxy.Create(FProxyObject, @TInterfacedObjectHack._AddRef,
+      @TInterfacedObjectHack.QueryInterface, @TInterfacedObjectHack._Release, ImplementedInterfaces[i],
+      InvokationHandler, IOffset);
 
-    MethodPointers[i] := FMethodStubs[i].Code;
+    FSynteticClass.Metaclass.GetInterfaceTable.Entries[i].VTable := FSupportedInterfaces[i].VTable;
+
+    VTable := FSynteticClass.Metaclass.GetInterfaceTable.Entries[i].VTable;
+
+    Move(VTable, Pointer(Integer(FProxyObject) + IOffset)^, SizeOf(Integer));
   end;
-
-  FDynamicInterfaceHelper := TDynamicInterfaceHelper.Create(
-    InterfaceType.GUID,
-    @TEbInterfacedObject.QueryInterface,
-    @TEbInterfacedObject._AddRef,
-    @TEbInterfacedObject._Release,
-    Self,
-    MethodPointers);       }
 end;
 
 constructor TDynamicProxy.Create(const ParentClass: TClass;
@@ -139,13 +160,48 @@ end;
 destructor TDynamicProxy.Destroy;
 var
   M: TMethodImpl;
+  P: TInterfaceProxy;
 begin
   for M in FParentClassVirtualMethods do
     M.Free;
-  FSynteticClass.Free;
-  FDynamicInterfaceHelper.Free;
+
+  for P in FSupportedInterfaces do
+    P.Free;
+
+  FNewDestroy.Free;
+
+
   FRttiContext.Free;
   inherited;
+end;
+
+procedure TDynamicProxy.GenerateNewDestroy;
+begin
+  FNewDestroy := TAsmBlock.Create;
+
+  { mov ecx, edx }
+  FNewDestroy.PutB([$8B, $CA]);
+
+  { mov edx, Self }
+  FNewDestroy.PutB($BA); FNewDestroy.PutI(Integer(Self));
+
+  { xchg eax, edx }
+  FNewDestroy.PutB($92);
+
+  FNewDestroy.GenJmp(@TDynamicProxy.NewDestroy);
+
+  FNewDestroy.Compile;
+end;
+
+procedure TDynamicProxy.NewDestroy(Instance: TObject; Outermost: SmallInt);
+var
+  Original: procedure(Outermost: Smallint) of object;
+begin
+  TMethod(Original).Code := FOriginalDestroy;
+  TMethod(Original).Data := Instance;
+  Original(Outermost);
+
+  Free;
 end;
 
 procedure TDynamicProxy.OverrideVirtualMethods(const ParentClass: TClass);
@@ -173,8 +229,13 @@ begin
 end;
 
 function TDynamicProxy.QueryInterface(const IID: TGUID; out Obj): HRESULT;
+var
+  i: Integer;
 begin
-  Result := FDynamicInterfaceHelper.QueryInterface(IID, Obj);
+  if GetInterface(IID, Obj) then
+    Result := 0
+  else
+    Result := E_NOINTERFACE;
 end;
 
 end.

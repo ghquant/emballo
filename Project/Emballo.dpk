@@ -89,6 +89,7 @@ contains
   Emballo.Mock.DummyMethodAction in '..\Src\Emballo.Mock.DummyMethodAction.pas',
   Emballo.Mock.RaiseExceptionClassMethodAction in '..\Src\Emballo.Mock.RaiseExceptionClassMethodAction.pas',
   Emballo.General in '..\Src\Emballo.General.pas',
-  Emballo.Mock.ReturnValueMethodAction in '..\Src\Emballo.Mock.ReturnValueMethodAction.pas';
+  Emballo.Mock.ReturnValueMethodAction in '..\Src\Emballo.Mock.ReturnValueMethodAction.pas',
+  Emballo.DynamicProxy.InterfaceProxy in '..\Src\Emballo.DynamicProxy.InterfaceProxy.pas';
 
 end.

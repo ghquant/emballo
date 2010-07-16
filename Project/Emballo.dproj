@@ -102,6 +102,7 @@
 			<DCCReference Include="..\Src\Emballo.Mock.RaiseExceptionClassMethodAction.pas"/>
 			<DCCReference Include="..\Src\Emballo.General.pas"/>
 			<DCCReference Include="..\Src\Emballo.Mock.ReturnValueMethodAction.pas"/>
+			<DCCReference Include="..\Src\Emballo.DynamicProxy.InterfaceProxy.pas"/>
 			<None Include="..\Src\Emballo.TypeWrappers.TypeWrapperInterfaceTemplate.inc"/>
 			<BuildConfiguration Include="Base">
 				<Key>Base</Key>

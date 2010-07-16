@@ -122,6 +122,7 @@ end;
 
 function TMocked.FooWithIntegerReturn: Integer;
 begin
+  Result := 0;
 end;
 
 initialization
