@@ -38,7 +38,7 @@ type
 
     function WillRaise(ExceptionClass: TExceptionClass): IWhen<T>;
 
-    procedure WillReturn(const Value: Integer);
+    function WillReturn(const Value: Integer): IWhen<T>;
   end;
 
 implementation

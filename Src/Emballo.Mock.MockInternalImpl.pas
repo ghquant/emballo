@@ -42,7 +42,7 @@ type
     function Expects: T;
     procedure VerifyUsage;
     function WillRaise(ExceptionClass: TExceptionClass): IWhen<T>;
-    procedure WillReturn(const Value: Integer);
+    function WillReturn(const Value: Integer): IWhen<T>;
     function When: T;
   public
     constructor Create;
@@ -138,9 +138,12 @@ begin
   FState := msDefiningExpectation;
 end;
 
-procedure TMockInternal<T>.WillReturn(const Value: Integer);
+function TMockInternal<T>.WillReturn(const Value: Integer): IWhen<T>;
 begin
+  FCurrentExpectation := TExpectedMethodCall.Create;
   FCurrentExpectation.Action := TReturnValueMethodAction<Integer>.Create(Value);
+  Result := Self;
+  FState := msDefiningExpectation;
 end;
 
 end.

@@ -51,8 +51,7 @@ procedure TMockTests.MethodShouldReturnSpecifiedValue;
 var
   ReturnValue: Integer;
 begin
-  FMock.Expects.FooWithIntegerReturn;
-  FMock.WillReturn(10);
+  FMock.WillReturn(10).When.FooWithIntegerReturn;
 
   ReturnValue := FMock.GetObject.FooWithIntegerReturn;
 
