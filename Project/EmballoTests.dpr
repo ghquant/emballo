@@ -50,7 +50,8 @@ uses
   Emballo.DynamicProxy.MethodImplTests in '..\Tests\Emballo.DynamicProxy.MethodImplTests.pas',
   Emballo.SynteticClassTests in '..\Tests\Emballo.SynteticClassTests.pas',
   Emballo.Mock.MockTests in '..\Tests\Emballo.Mock.MockTests.pas',
-  Emballo.DynamicProxy.InterfaceProxyTests in '..\Tests\Emballo.DynamicProxy.InterfaceProxyTests.pas';
+  Emballo.DynamicProxy.InterfaceProxyTests in '..\Tests\Emballo.DynamicProxy.InterfaceProxyTests.pas',
+  Emballo.Mock.EqualsParameterMatcherTests in '..\Tests\Emballo.Mock.EqualsParameterMatcherTests.pas';
 
 {$R *.RES}
 

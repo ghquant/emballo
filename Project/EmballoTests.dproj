@@ -22,7 +22,6 @@
 		<PropertyGroup Condition="'$(Base)'!=''">
 			<DCC_IntegerOverflowCheck>true</DCC_IntegerOverflowCheck>
 			<DCC_RangeChecking>true</DCC_RangeChecking>
-			<DCC_DebugDCUs>true</DCC_DebugDCUs>
 			<DCC_UnitSearchPath>$(BDS)\Source\DUnit\src;..\Src;$(DCC_UnitSearchPath)</DCC_UnitSearchPath>
 			<DCC_DependencyCheckOutputName>EmballoTests.exe</DCC_DependencyCheckOutputName>
 			<DCC_ImageBase>00400000</DCC_ImageBase>
@@ -70,6 +69,7 @@
 			<DCCReference Include="..\Tests\Emballo.SynteticClassTests.pas"/>
 			<DCCReference Include="..\Tests\Emballo.Mock.MockTests.pas"/>
 			<DCCReference Include="..\Tests\Emballo.DynamicProxy.InterfaceProxyTests.pas"/>
+			<DCCReference Include="..\Tests\Emballo.Mock.EqualsParameterMatcherTests.pas"/>
 			<BuildConfiguration Include="Base">
 				<Key>Base</Key>
 			</BuildConfiguration>

@@ -40,6 +40,9 @@ function GetGUIDFromTypeInfo(ATypeInfo: PTypeInfo): TGUID;
 { Returns the TRttiInterfaceType of an interface, given it's GUID }
 function GetRttiTypeFromGUID(Ctx: TRttiContext; GUID: TGUID): TRttiInterfaceType;
 
+{ Returns the size of the type via it's typeinfo }
+function GetTypeSize(const Info: PTypeInfo): Integer;
+
 implementation
 
 function GetRttiTypeFromGUID(Ctx: TRttiContext; GUID: TGUID): TRttiInterfaceType;
@@ -80,6 +83,18 @@ begin
   Ctx := TRttiContext.Create;
   try
     Result := (Ctx.GetType(ATypeInfo) as TRttiInterfaceType).GUID;
+  finally
+    Ctx.Free;
+  end;
+end;
+
+function GetTypeSize(const Info: PTypeInfo): Integer;
+var
+  Ctx: TRttiContext;
+begin
+  Ctx := TRttiContext.Create;
+  try
+    Result := Ctx.GetType(Info).TypeSize;
   finally
     Ctx.Free;
   end;

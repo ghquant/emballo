@@ -93,6 +93,8 @@ contains
   Emballo.DynamicProxy.InterfaceProxy in '..\Src\Emballo.DynamicProxy.InterfaceProxy.pas',
   Emballo.Mock.MockInternal in '..\Src\Emballo.Mock.MockInternal.pas',
   Emballo.Mock.UnexpectedUsage in '..\Src\Emballo.Mock.UnexpectedUsage.pas',
-  Emballo.Mock.When in '..\Src\Emballo.Mock.When.pas';
+  Emballo.Mock.When in '..\Src\Emballo.Mock.When.pas',
+  Emballo.Mock.ParameterMatcher in '..\Src\Emballo.Mock.ParameterMatcher.pas',
+  Emballo.Mock.EqualsParameterMatcher in '..\Src\Emballo.Mock.EqualsParameterMatcher.pas';
 
 end.

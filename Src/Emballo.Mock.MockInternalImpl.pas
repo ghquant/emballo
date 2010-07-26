@@ -23,7 +23,9 @@ interface
 uses
   SysUtils,
   Classes,
+  Rtti,
   Generics.Collections,
+  Emballo.DynamicProxy.InvokationHandler,
   Emballo.General,
   Emballo.Mock.ExpectedMethodCall,
   Emballo.Mock.MethodAction,
@@ -39,6 +41,9 @@ type
     FState: TMockState;
     FExpectedCalls: TList<TExpectedMethodCall>;
     FCurrentExpectation: TExpectedMethodCall;
+    function IsMatchingCall(const Expected: TExpectedMethodCall; const Method: TRttiMethod;
+      const Parameters: array of IParameter): Boolean;
+    procedure DefineExpectation(const Method: TRttiMethod; const Parameters: array of IParameter);
     function BeginExpectation(Action: IMethodAction): IWhen<T>;
     function GetObject: T;
     function Expects: T;
@@ -55,12 +60,11 @@ implementation
 
 uses
   Emballo.DynamicProxy.DynamicProxyService,
-  Emballo.DynamicProxy.InvokationHandler,
-  Rtti,
   Emballo.Mock.DummyMethodAction,
   Emballo.Mock.UnexpectedUsage,
   Emballo.Mock.RaiseExceptionClassMethodAction,
-  Emballo.Mock.ReturnValueMethodAction;
+  Emballo.Mock.ReturnValueMethodAction, Emballo.Mock.ParameterMatcher,
+  Emballo.Mock.EqualsParameterMatcher;
 
 { TMockInternal<T> }
 
@@ -80,29 +84,44 @@ begin
 
   InvokationHandler := procedure(const Method: TRttiMethod;
     const Parameters: TArray<IParameter>; const Result: IParameter)
+
   begin
     case FState of
       msCheckingUsage:
       begin
-        if (FExpectedCalls.Count = 0) or (not FExpectedCalls[0].Method.Equals(Method)) then
+        if (FExpectedCalls.Count = 0) or (not IsMatchingCall(FExpectedCalls[0], Method, Parameters)) then
           raise EUnexpectedUsage.Create('Error Message');
 
         FExpectedCalls[0].Action.Execute(Result);
         FExpectedCalls[0].Free;
         FExpectedCalls.Delete(0);
       end;
-      msDefiningExpectation:
-      begin
-        FState := msCheckingUsage;
-        FCurrentExpectation.Method := Method;
-        FExpectedCalls.Add(FCurrentExpectation);
-      end;
+      msDefiningExpectation: DefineExpectation(Method, Parameters);
     end;
   end;
 
   FState := msCheckingUsage;
 
   FObject := DynamicProxyService.Get<T>(InvokationHandler);
+end;
+
+procedure TMockInternal<T>.DefineExpectation(const Method: TRttiMethod;
+  const Parameters: array of IParameter);
+var
+  i: Integer;
+  RttiParameters: TArray<TRttiParameter>;
+  Matchers: array of IParameterMatcher;
+begin
+  FState := msCheckingUsage;
+  RttiParameters := Method.GetParameters;
+  FCurrentExpectation.Method := Method;
+  SetLength(Matchers, Length(Parameters));
+  for i := 0 to High(Matchers) do
+    Matchers[i] := TEqualsParameterMatcher<Integer>.Create(Parameters[i].AsInteger);
+
+  FCurrentExpectation.RegisterParameterMatchers(Matchers);
+
+  FExpectedCalls.Add(FCurrentExpectation);
 end;
 
 destructor TMockInternal<T>.Destroy;
@@ -124,6 +143,23 @@ end;
 function TMockInternal<T>.GetObject: T;
 begin
   Result := FObject;
+end;
+
+function TMockInternal<T>.IsMatchingCall(const Expected: TExpectedMethodCall;
+  const Method: TRttiMethod; const Parameters: array of IParameter): Boolean;
+var
+  i: Integer;
+begin
+  Result := False;
+
+  if not Expected.Method.Equals(Method) then
+    Exit;
+
+  for i := 0 to High(Parameters) do
+    if not Expected.ParameterMatcher[i].Match(Parameters[i].AsInteger) then
+      Exit;
+
+  Result := True;
 end;
 
 procedure TMockInternal<T>.VerifyUsage;

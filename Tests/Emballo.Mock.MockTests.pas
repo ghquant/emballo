@@ -12,6 +12,7 @@ type
   public
     procedure Foo; virtual;
     function FooWithIntegerReturn: Integer; virtual;
+    procedure FooWithParameters(const A: Integer); virtual;
   end;
 
   ETestException = class(Exception)
@@ -24,6 +25,7 @@ type
     procedure SetUp; override;
     procedure TearDown; override;
   published
+    procedure ShouldFailOnUnexpectedParameters;
     procedure ShouldFailOnUnexpectedCalls;
     procedure ExpectedCallShouldNotFail;
     procedure ShouldRaiseConfiguredException;
@@ -74,9 +76,22 @@ end;
 
 procedure TMockTests.ShouldFailOnUnexpectedCalls;
 begin
+  { 1. Call a method that is unexpected }
   try
     FMock.GetObject.Foo;
     Fail('An unexpected usage of the mocked object should raise an EUnexpectedUsage');
+  except
+    on EUnexpectedUsage do CheckTrue(True);
+  end;
+end;
+
+procedure TMockTests.ShouldFailOnUnexpectedParameters;
+begin
+  FMock.Expects.FooWithParameters(10);
+
+  try
+    FMock.GetObject.FooWithParameters(11);
+    Fail('Calling an expected method with unexpected parameters should fail');
   except
     on EUnexpectedUsage do CheckTrue(True);
   end;
@@ -130,6 +145,11 @@ end;
 function TMocked.FooWithIntegerReturn: Integer;
 begin
   Result := 0;
+end;
+
+procedure TMocked.FooWithParameters(const A: Integer);
+begin
+
 end;
 
 initialization

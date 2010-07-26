@@ -22,18 +22,56 @@ interface
 
 uses
   Rtti, SysUtils,
-  Emballo.Mock.MethodAction;
+  Emballo.DynamicProxy.InvokationHandler,
+  Emballo.Mock.MethodAction,
+  Emballo.Mock.ParameterMatcher,
+  Generics.Collections;
 
 type
   TExpectedMethodCall = class
   private
     FMethod: TRttiMethod;
     FAction: IMethodAction;
+    FParameterMatchers: array of IParameterMatcher;
+    function GetParameterMatcher(Index: Integer): IParameterMatcher;
   public
+    destructor Destroy; override;
     property Method: TRttiMethod read FMethod write FMethod;
     property Action: IMethodAction read FAction write FAction;
+
+    procedure RegisterParameterMatchers(const Matchers: array of IParameterMatcher);
+    property ParameterMatcher[Index: Integer]: IParameterMatcher read GetParameterMatcher;
+    constructor Create;
   end;
 
 implementation
+
+{ TExpectedMethodCall }
+
+constructor TExpectedMethodCall.Create;
+begin
+
+end;
+
+destructor TExpectedMethodCall.Destroy;
+begin
+
+  inherited;
+end;
+
+function TExpectedMethodCall.GetParameterMatcher(Index: Integer): IParameterMatcher;
+begin
+  Result := FParameterMatchers[Index];
+end;
+
+procedure TExpectedMethodCall.RegisterParameterMatchers(
+  const Matchers: array of IParameterMatcher);
+var
+  i: Integer;
+begin
+  SetLength(FParameterMatchers, Length(Matchers));
+  for i := 0 to High(Matchers) do
+    FParameterMatchers[i] := Matchers[i];
+end;
 
 end.
