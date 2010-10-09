@@ -63,8 +63,6 @@ procedure TDynamicProxyTests.InvokationHandlerShouldBeCalled;
 var
   Test: TTestClass;
   Invoked: Boolean;
-  D: Double;
-  E: String;
   InvokationHandler: TInvokationHandlerAnonMethod;
 begin
   InvokationHandler := procedure(const Method: TRttiMethod;

@@ -88,10 +88,6 @@
 			</BuildConfiguration>
 		</ItemGroup>
 		<Import Project="$(BDS)\Bin\CodeGear.Delphi.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Delphi.Targets')"/>
-		<PropertyGroup>
-			<PreBuildEvent><![CDATA[cd ..\Tests\Python
-python Emballo.DynamicProxy.MethodImplTests_CodeGen.py]]></PreBuildEvent>
-		</PropertyGroup>
 		<ProjectExtensions>
 			<Borland.Personality>Delphi.Personality.12</Borland.Personality>
 			<Borland.ProjectType/>

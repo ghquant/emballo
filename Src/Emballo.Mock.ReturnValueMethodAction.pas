@@ -28,7 +28,6 @@ type
   TReturnValueMethodAction<T> = class(TInterfacedObject, IMethodAction)
   private
     FValue: T;
-    FStrValue: String;
   protected
     procedure Execute(const ResultParameter: IParameter); virtual;
   public

@@ -140,7 +140,6 @@ end;
 procedure TMethodInvokationInfoTests.ParamCountShouldNotAccountForImplicitParameters;
 var
   InvokationInfo: TMethodInvokationInfo;
-  Info: TParamInfo;
 begin
   InvokationInfo := GetInvokationInfo('ParameterlessProcedureRegister');
   try
