@@ -35,7 +35,8 @@ type
     function Expects: T;
     procedure VerifyUsage;
     function WillRaise(ExceptionClass: TExceptionClass): IWhen<T>;
-    function WillReturn(const Value: Integer): IWhen<T>;
+    function WillReturn(const Value: Integer): IWhen<T>; overload;
+    function WillReturn(const Value: String): IWhen<T>; overload;
     class function Create: TMock<T>; static;
     procedure Free;
     class operator Implicit(const Value: TMock<T>): T;
@@ -81,6 +82,11 @@ end;
 function TMock<T>.WillRaise(ExceptionClass: TExceptionClass): IWhen<T>;
 begin
   Result := FInternal.WillRaise(ExceptionClass);
+end;
+
+function TMock<T>.WillReturn(const Value: String): IWhen<T>;
+begin
+  Result := FInternal.WillReturn(Value);
 end;
 
 function TMock<T>.WillReturn(const Value: Integer): IWhen<T>;

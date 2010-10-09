@@ -33,6 +33,7 @@ program EmballoTests;
 {$ENDIF}
 
 uses
+  FastMM4,
   Forms,
   TestFramework,
   GUITestRunner,
@@ -47,11 +48,15 @@ uses
   Emballo.DynamicProxy.ImplTests in '..\Tests\Emballo.DynamicProxy.ImplTests.pas',
   Emballo.DllWrapper.ImplTests in '..\Tests\Emballo.DllWrapper.ImplTests.pas',
   Emballo.Hash.Md5AlgorithmTests in '..\Tests\Emballo.Hash.Md5AlgorithmTests.pas',
-  Emballo.DynamicProxy.MethodImplTests in '..\Tests\Emballo.DynamicProxy.MethodImplTests.pas',
   Emballo.SynteticClassTests in '..\Tests\Emballo.SynteticClassTests.pas',
   Emballo.Mock.MockTests in '..\Tests\Emballo.Mock.MockTests.pas',
   Emballo.DynamicProxy.InterfaceProxyTests in '..\Tests\Emballo.DynamicProxy.InterfaceProxyTests.pas',
-  Emballo.Mock.EqualsParameterMatcherTests in '..\Tests\Emballo.Mock.EqualsParameterMatcherTests.pas';
+  Emballo.Mock.EqualsParameterMatcherTests in '..\Tests\Emballo.Mock.EqualsParameterMatcherTests.pas',
+  Emballo.DynamicProxy.MethodImplTests_Cdecl in '..\Tests\Emballo.DynamicProxy.MethodImplTests_Cdecl.pas',
+  Emballo.DynamicProxy.MethodImplTests_Pascal in '..\Tests\Emballo.DynamicProxy.MethodImplTests_Pascal.pas',
+  Emballo.DynamicProxy.MethodImplTests_Stdcall in '..\Tests\Emballo.DynamicProxy.MethodImplTests_Stdcall.pas',
+  Emballo.DynamicProxy.MethodImplTests_Register in '..\Tests\Emballo.DynamicProxy.MethodImplTests_Register.pas',
+  Emballo.RuntimeCodeGeneration.MethodInvokationInfoTests in '..\Tests\Emballo.RuntimeCodeGeneration.MethodInvokationInfoTests.pas';
 
 {$R *.RES}
 

@@ -26,8 +26,7 @@ uses
 type
   TTestClass = class
   public
-    procedure TestCaseA(A: Byte; B: Integer; C: Double; out D: Double;
-      var E: String); virtual; abstract;
+    procedure TestCaseA(A: Byte; B: Integer); virtual; abstract;
   end;
 
   {$M+}
@@ -77,7 +76,7 @@ begin
   Test := NewProxy(InvokationHandler);
   try
     Invoked := False;
-    Test.TestCaseA(0, 0, 0, D, E);
+    Test.TestCaseA(0, 0);
     CheckTrue(Invoked, 'The invokation handler should be called when a virtual method is called');
   finally
     Test.Free;

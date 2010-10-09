@@ -28,6 +28,7 @@ uses
 type
   TParameter = class(TInterfacedObject, IParameter)
   strict private
+    FTypeKind: TTypeKind;
     FAddress: Pointer;
     FByValue: Boolean;
     procedure CheckCanSetValue;
@@ -39,24 +40,54 @@ type
     function GetAsDouble: Double;
     procedure SetAsDouble(Value: Double);
     function GetAsString: String;
-    procedure SetAsString(Value: String);
+    procedure SetAsString(const Value: String);
     function GetAsBoolean: Boolean;
     procedure SetAsBoolean(Value: Boolean);
   public
     { Address is the address on the stack where the value is.
       It ByValue = True, then this is the actual value. If ByValue = False,
       it's a pointer to the actual value }
-    constructor Create(Address: Pointer; ByValue: Boolean; TypeKind: TTypeKind);
+    constructor Create(const Address: Pointer; const ByValue: Boolean;
+      const TypeKind: TTypeKind);
+    destructor Destroy; override;
   end;
 
 implementation
 
+type
+  PStrRec = ^StrRec;
+  StrRec = packed record
+    codePage: Word;
+    elemSize: Word;
+    refCnt: Longint;
+    length: Longint;
+  end;
+
 { TParameter }
 
-constructor TParameter.Create(Address: Pointer; ByValue: Boolean; TypeKind: TTypeKind);
+constructor TParameter.Create(const Address: Pointer; const ByValue: Boolean;
+  const TypeKind: TTypeKind);
 begin
   FAddress := Address;
   FByValue := ByValue;
+  FTypeKind := TypeKind;
+end;
+
+destructor TParameter.Destroy;
+var
+  Rec: PStrRec;
+  P: Integer;
+begin
+  if FTypeKind = tkUString then
+  begin
+    P := PInteger(FAddress^)^;
+    if P > 0 then
+    begin
+      Rec := PStrRec(P - SizeOf(StrRec));
+      Dec(Rec.refCnt);
+    end;
+  end;
+  inherited;
 end;
 
 procedure TParameter.CheckCanSetValue;
@@ -102,7 +133,7 @@ begin
   if FByValue then
     Result := String(FAddress^)
   else
-    Result := PString(FAddress^)^;
+    Result := PString(FAddress)^;
 end;
 
 procedure TParameter.SetAsBoolean(Value: Boolean);
@@ -129,7 +160,10 @@ begin
   PInteger(FAddress^)^ := Value;
 end;
 
-procedure TParameter.SetAsString(Value: String);
+procedure TParameter.SetAsString(const Value: String);
+var
+  Dest: Pointer;
+  Rec: PStrRec;
 begin
   CheckCanSetValue;
   PString(FAddress^)^ := Value;

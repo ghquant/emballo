@@ -208,7 +208,7 @@ begin
       if Method.DispatchKind = dkVtable then
       begin
         SetLength(FParentClassVirtualMethods, Length(FParentClassVirtualMethods) + 1);
-        MethodImpl := TMethodImpl.Create(Method, FInvokationHandler);
+        MethodImpl := TMethodImpl.Create(FRttiContext, Method, FInvokationHandler);
         FParentClassVirtualMethods[High(FParentClassVirtualMethods)] := MethodImpl;
         FSynteticClass.VirtualMethodAddress[Method.VirtualIndex] := MethodImpl.CodeAddress;
       end;

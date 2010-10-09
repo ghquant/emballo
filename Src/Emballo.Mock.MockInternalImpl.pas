@@ -49,7 +49,8 @@ type
     function Expects: T;
     procedure VerifyUsage;
     function WillRaise(ExceptionClass: TExceptionClass): IWhen<T>;
-    function WillReturn(const Value: Integer): IWhen<T>;
+    function WillReturn(const Value: Integer): IWhen<T>; overload;
+    function WillReturn(const Value: String): IWhen<T>; overload;
     function When: T;
   public
     constructor Create;
@@ -176,6 +177,11 @@ end;
 function TMockInternal<T>.WillRaise(ExceptionClass: TExceptionClass): IWhen<T>;
 begin
   Result := BeginExpectation(TRaiseExceptionClassMethodAction.Create(ExceptionClass));
+end;
+
+function TMockInternal<T>.WillReturn(const Value: String): IWhen<T>;
+begin
+  Result := BeginExpectation(TReturnStringValueMethodAction.Create(Value));
 end;
 
 function TMockInternal<T>.WillReturn(const Value: Integer): IWhen<T>;

@@ -75,7 +75,7 @@ begin
   SetLength(MethodAddresses, Length(FMethods));
 
   for i := 0 to Length(Methods) - IINTERFACE_METHOD_COUNT - 1 do
-    FMethods[i] := TMethodImpl.Create(Methods[i], InvokationHandler);
+    FMethods[i] := TMethodImpl.Create(FRttiContext, Methods[i], InvokationHandler);
 
   SetLength(FInterfaceStubs, Length(Methods) + 3);
   SetLength(FStubsAddresses, Length(FInterfaceStubs));

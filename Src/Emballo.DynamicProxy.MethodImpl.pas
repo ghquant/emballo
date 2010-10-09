@@ -23,6 +23,7 @@ interface
 uses
   Rtti,
   Emballo.DynamicProxy.InvokationHandler,
+  Emballo.DynamicProxy.NativeToInvokationHandlerBridge,
   Emballo.RuntimeCodeGeneration.AsmBlock;
 
 type
@@ -31,13 +32,16 @@ type
     FGeneratedMethod: TAsmBlock;
     FInvokationHandler: TInvokationHandlerAnonMethod;
     FMethod: TRttiMethod;
+    FRttiContext: TRttiContext;
+    FBridge: TNativeToInvokationHandlerBridge;
+    function OffsetToInitialStackPosition(const SizeOfResult: Integer): Integer;
     function GetCodeAddress: Pointer;
     procedure GenerateReturnCode;
     procedure GenerateMethod;
     procedure CallInvokationHander(const ParamsBaseStackAddress: Pointer;
       Eax, Edx, Ecx, ResultValue: Pointer); stdcall;
   public
-    constructor Create(const Method: TRttiMethod;
+    constructor Create(const RttiContext: TRttiContext; const Method: TRttiMethod;
       const InvokationHandler: TInvokationHandlerAnonMethod);
     destructor Destroy; override;
     property CodeAddress: Pointer read GetCodeAddress;
@@ -46,99 +50,69 @@ type
 implementation
 
 uses
+  Windows,
   Emballo.RuntimeCodeGeneration.CallingConventions, TypInfo,
-  Emballo.DynamicProxy.InvokationHandler.ParameterImpl;
+  Emballo.DynamicProxy.InvokationHandler.ParameterImpl,
+  Emballo.RuntimeCodeGeneration.MethodInvokationInfo;
+
+procedure _UStrAsg(var Dest: UnicodeString; const Source: UnicodeString);
+asm
+  call System.@UStrAsg
+end;
 
 { TMethodImpl }
 
 procedure TMethodImpl.CallInvokationHander(const ParamsBaseStackAddress: Pointer;
   Eax, Edx, Ecx, ResultValue: Pointer);
 
-  function CreateParamFromStack(var CurrentStackAddress: PByte;
-    const CallingConvention: ICallingConvention; const ByValue: Boolean;
-    const Param: TRttiParameter): IParameter;
+  function BuildParam(Info: TParamInfo; RttiInfo: TRttiType; IsResult: Boolean): IParameter;
   begin
-    Result := TParameter.Create(CurrentStackAddress, ByValue, Param.ParamType.TypeKind);
-    Inc(CurrentStackAddress, CallingConvention.NumBytesForPassingParameterOnTheStack(Param));
+    if IsResult then
+      Result := TParameter.Create(@ResultValue, False, RttiInfo.TypeKind)
+    else
+    begin
+      case Info.Location of
+        plStack: Result := TParameter.Create(Pointer(Integer(ParamsBaseStackAddress) + Info.StackOffset), Info.ByValue, RttiInfo.TypeKind);
+        plEax: Result := TParameter.Create(PPointer(Eax), Info.ByValue, RttiInfo.TypeKind);
+        plEcx: Result := TParameter.Create(PPointer(Ecx), Info.ByValue, RttiInfo.TypeKind);
+        plEdx: Result := TParameter.Create(PPointer(Edx), Info.ByValue, RttiInfo.TypeKind);
+      end;
+    end;
   end;
 
 var
-  CallingConvention: ICallingConvention;
+  ParamInfo: TParamInfo;
+  InvokationInfo: TMethodInvokationInfo;
+  RttiParams: TArray<TRttiParameter>;
   Params: TArray<IParameter>;
-  Location: (lEdx, lEcx, lStack);
-  RttiParameter: TRttiParameter;
-  PassByValue: Boolean;
   i: Integer;
-  CurrentStackAddress: PByte;
-  ResultParam: IParameter;
+  Result: IParameter;
 begin
-  CallingConvention := GetCallingConvention(FMethod.CallingConvention);
-
-  CurrentStackAddress := ParamsBaseStackAddress;
-
-  if FMethod.CallingConvention = ccReg then
-    Location := lEdx
-  else
-  begin
-    Location := lStack;
-
-    { Skip the implicit "Self" parameter }
-    Inc(CurrentStackAddress, SizeOf(Integer));
-  end;
-
-  SetLength(Params, Length(FMethod.GetParameters));
-  for i := 0 to Length(Params) - 1 do
-  begin
-    RttiParameter := FMethod.GetParameters[i];
-    PassByValue := CallingConvention.ParameterPassingStrategy(RttiParameter) = ppByValue;
-
-    case Location of
-      lEdx:
-      begin
-        if RttiParameter.ParamType.TypeSize > SizeOf(Integer) then
-        begin
-          Params[i] := CreateParamFromStack(CurrentStackAddress, CallingConvention,
-            PassByValue, RttiParameter);
-        end
-        else
-        begin
-          Params[i] := TParameter.Create(Edx, PassByValue, RttiParameter.ParamType.TypeKind);
-          Inc(Location);
-        end;
-      end;
-      lEcx:
-      begin
-        if RttiParameter.ParamType.TypeSize > SizeOf(Integer) then
-        begin
-          Params[i] := CreateParamFromStack(CurrentStackAddress, CallingConvention,
-            PassByValue, RttiParameter);
-        end
-        else
-        begin
-          Params[i] := TParameter.Create(Ecx, PassByValue, RttiParameter.ParamType.TypeKind);
-          Inc(Location);
-        end;
-      end;
-      lStack:
-      begin
-        Params[i] := CreateParamFromStack(CurrentStackAddress, CallingConvention,
-          PassByValue, RttiParameter);
-      end;
+  InvokationInfo := TMethodInvokationInfo.Create(FMethod);
+  try
+    RttiParams := FMethod.GetParameters;
+    SetLength(Params, Length(RttiParams));
+    for i := 0 to High(Params) do
+    begin
+      ParamInfo := InvokationInfo.Params[i];
+      Params[i] := BuildParam(ParamInfo, RttiParams[i].ParamType, False);
     end;
 
+    if InvokationInfo.HasResult then
+      Result := BuildParam(InvokationInfo.ResultInfo, FMethod.ReturnType, True)
+    else
+      Result := Nil;
+  finally
+    InvokationInfo.Free;
   end;
 
-  if Assigned(FMethod.ReturnType) then
-    ResultParam := TParameter.Create(@ResultValue, False, FMethod.ReturnType.TypeKind)
-  else
-    ResultParam := Nil;
-
-  FInvokationHandler(FMethod, Params, ResultParam);
+  FInvokationHandler(FMethod, Params, Result);
 end;
 
-constructor TMethodImpl.Create(const Method: TRttiMethod;
+constructor TMethodImpl.Create(const RttiContext: TRttiContext; const Method: TRttiMethod;
   const InvokationHandler: TInvokationHandlerAnonMethod);
 begin
+  FRttiContext := RttiContext;
   FGeneratedMethod := TAsmBlock.Create;
   FInvokationHandler := InvokationHandler;
   FMethod := Method;
@@ -161,6 +135,9 @@ var
 begin
   CallingConvention := GetCallingConvention(FMethod.CallingConvention);
 
+  { Calculates the size of the return type, if any. Remember that managed
+    return types are treated as out parameters, which are passed as the last
+    parameter }
   if Assigned(FMethod.ReturnType) then
     SizeOfResult := FMethod.ReturnType.TypeSize
   else
@@ -216,11 +193,10 @@ begin
   { push edx }
   FGeneratedMethod.PutB($52);
 
-  { 10. Takes the value of esp as it was at the beginning of this method and put it
-    as the 2nd parameter to CallInvokationHandler. This is the base address to access
-    the parameters which are on the stack }
-  { mov edx, [esp+$04] }
-  FGeneratedMethod.PutB([$8D, $54, $24, 8*SizeOf(Integer) + SizeOfResult]);
+  { 10. Takes the value of the first parameter on the stack (if there's any) and
+        put it as the 2nd parameter to CallInvokationHandler }
+  { mov edx, N] }
+  FGeneratedMethod.PutB([$8D, $54, $24, OffsetToInitialStackPosition(SizeOfResult)]);
 
   { puah edx }
   FGeneratedMethod.PutB($52);
@@ -229,21 +205,28 @@ begin
   { push <pointer to this TMethodImpl> }
   FGeneratedMethod.PutB($68); FGeneratedMethod.PutI(Integer(Self));
 
-  { 12. Call the "CallInvokationHandler" }
+  { 12. If the result is managed, initialize our local variable to zero }
+  if Assigned(FMethod.ReturnType) and FMethod.ReturnType.IsManaged then
+  begin
+    { mov ebp-$10, 0 }
+    FGeneratedMethod.PutB([$C7, $45, $F0, $00, $00, $00, $00]);
+  end;
+
+  { 13. Call the "CallInvokationHandler" }
   { call TMethodImpl.CallInvokationHander }
   FGeneratedMethod.GenCall(@TMethodImpl.CallInvokationHander);
 
-  { 13. If the method has a return value, do it }
+  { 14. If the method has a return value, do it }
   GenerateReturnCode;
 
-  { 14. Undo the stack frame }
+  { 15. Undo the stack frame }
   { mov esp, ebp }
   FGeneratedMethod.PutB([$8B, $E5]);
 
   { pop ebp }
   FGeneratedMethod.PutB($5D);
 
-  { 15. Return to the caller }
+  { 16. Return to the caller }
   if CallingConvention.StackCleaningResponsability = scCaller then
     FGeneratedMethod.GenRet
   else
@@ -251,6 +234,9 @@ begin
     NumBytes := 0;
     for Param in FMethod.GetParameters do
       Inc(NumBytes, CallingConvention.NumBytesForPassingParameterOnTheStack(Param));
+
+    if Assigned(FMethod.ReturnType) and FMethod.ReturnType.IsManaged then
+      Inc(NumBytes, SizeOf(Pointer));
 
     FGeneratedMethod.GenRet(NumBytes);
   end;
@@ -261,6 +247,42 @@ procedure TMethodImpl.GenerateReturnCode;
   begin
     { mov eax, [ebp-$10] }
     FGeneratedMethod.PutB([$8B, $45, $F0]);
+  end;
+
+  procedure ReturnString;
+  var
+    Info: TMethodInvokationInfo;
+  begin
+    Info := TMethodInvokationInfo.Create(FMethod);
+    try
+      { We have to put on eax the value that was initialy on the location where
+        we are suposed to return the result string. This value is the pointer
+        of the String variable that we have to set }
+      case Info.ResultInfo.Location of
+        plEax:
+        begin
+          { mov eax, [ebp-$4] }
+          FGeneratedMethod.PutB([$8B, $45, $FC]);
+        end;
+        plEdx:
+        begin
+          { mov eax, [ebp-$08] }
+          FGeneratedMethod.PutB([$8B, $45, $F8]);
+        end;
+        plStack:
+        begin
+          { mov eax, [ebp-Info.ResultInfo.StackOffset] }
+          FGeneratedMethod.PutB([$8B, $45, Byte((2*SizeOf(Integer) + Info.ResultInfo.StackOffset))]);
+        end;
+      end;
+
+      { mov edx, [ebp-$10] }
+      FGeneratedMethod.PutB([$8B, $55, $F0]);
+      { call _UStrAsn }
+      FGeneratedMethod.GenCall(@_UStrAsg);
+    finally
+      Info.Free;
+    end;
   end;
 
   procedure ReturnFloat;
@@ -274,6 +296,8 @@ begin
 
   if FMethod.ReturnType.TypeKind = tkFloat then
     ReturnFloat
+  else if FMethod.ReturnType.TypeKind = tkUString then
+    ReturnString
   else
     ReturnOnEax;
 end;
@@ -281,6 +305,12 @@ end;
 function TMethodImpl.GetCodeAddress: Pointer;
 begin
   Result := FGeneratedMethod.Block;
+end;
+
+function TMethodImpl.OffsetToInitialStackPosition(
+  const SizeOfResult: Integer): Integer;
+begin
+  Result := 9*SizeOf(Integer) + SizeOfResult;
 end;
 
 end.

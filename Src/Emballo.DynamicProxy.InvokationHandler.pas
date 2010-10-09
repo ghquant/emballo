@@ -38,7 +38,7 @@ type
     function GetAsDouble: Double;
     procedure SetAsDouble(Value: Double);
     function GetAsString: String;
-    procedure SetAsString(Value: String);
+    procedure SetAsString(const Value: String);
     function GetAsBoolean: Boolean;
     procedure SetAsBoolean(Value: Boolean);
 

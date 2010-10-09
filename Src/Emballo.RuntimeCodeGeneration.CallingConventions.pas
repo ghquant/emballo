@@ -27,17 +27,25 @@ uses
 type
   TStackCleaningResponsability = (scCaller, scCallee);
   TParameterPassingStrategy = (ppByValue, ppByRef);
+  TParametersPassingOrder = (poLeftToRight, poRightToLeft);
 
   ICallingConvention = interface
     ['{8ABDB7FB-CEFA-444C-944F-615C4BD05E1D}']
     function GetStackCleaningResponsability: TStackCleaningResponsability;
     function GetName: String;
 
-    function NumBytesForPassingParameterOnTheStack(const Parameter: TRttiParameter): Integer;
-    function ParameterPassingStrategy(Parameter: TRttiParameter): TParameterPassingStrategy;
+    function NumBytesForPassingParameterOnTheStack(const Parameter: TRttiParameter): Integer; overload;
+    function NumBytesForPassingParameterOnTheStack(const ParamType: TRttiType;
+      const Flags: TParamFlags): Integer; overload;
+
+    function ParameterPassingStrategy(const Parameter: TRttiParameter): TParameterPassingStrategy; overload;
+    function ParameterPassingStrategy(const Info: PTypeInfo;
+      const Flags: TParamFlags): TParameterPassingStrategy; overload;
+    function GetParametersPassingOrder: TParametersPassingOrder;
     property StackCleaningResponsability: TStackCleaningResponsability read
       GetStackCleaningResponsability;
     property Name: String read GetName;
+    property ParametersPassingOrder: TParametersPassingOrder read GetParametersPassingOrder;
   end;
 
   TCallingConvention = class(TInterfacedObject, ICallingConvention)
@@ -48,8 +56,13 @@ type
 
     function GetName: String;
     function GetStackCleaningResponsability: TStackCleaningResponsability;
-    function NumBytesForPassingParameterOnTheStack(const Parameter: TRttiParameter): Integer;
-    function ParameterPassingStrategy(Parameter: TRttiParameter): TParameterPassingStrategy;
+    function NumBytesForPassingParameterOnTheStack(const Parameter: TRttiParameter): Integer; overload;
+    function ParameterPassingStrategy(const Parameter: TRttiParameter): TParameterPassingStrategy; overload;
+    function ParameterPassingStrategy(const Info: PTypeInfo;
+      const Flags: TParamFlags): TParameterPassingStrategy; overload;
+    function NumBytesForPassingParameterOnTheStack(const ParamType: TRttiType;
+      const Flags: TParamFlags): Integer; overload;
+    function GetParametersPassingOrder: TParametersPassingOrder;
   public
     constructor Create(const Name: String; CallConv: TCallConv;
       StackCleaningResponsability: TStackCleaningResponsability);
@@ -107,40 +120,61 @@ begin
   Result := FName;
 end;
 
+function TCallingConvention.GetParametersPassingOrder: TParametersPassingOrder;
+begin
+  if FCallConv in [ccPascal, ccReg] then
+    Result := poLeftToRight
+  else
+    Result := poRightToLeft;
+end;
+
 function TCallingConvention.GetStackCleaningResponsability: TStackCleaningResponsability;
 begin
   Result := FStackCleaningResponsability;
 end;
 
 function TCallingConvention.NumBytesForPassingParameterOnTheStack(
-  const Parameter: TRttiParameter): Integer;
+  const ParamType: TRttiType; const Flags: TParamFlags): Integer;
 begin
-  if ParameterPassingStrategy(Parameter) = ppByRef then
+  if ParameterPassingStrategy(ParamType.Handle, Flags) = ppByRef then
     Result := SizeOf(Pointer)
   else
   begin
-    Result := (((Parameter.ParamType.TypeSize - 1) div SizeOf(Pointer)) + 1)*SizeOf(Pointer);
+    Result := (((ParamType.TypeSize - 1) div SizeOf(Pointer)) + 1)*SizeOf(Pointer);
 
     { Each array parameter has an implicit parameter for the array length }
-    if pfArray in Parameter.Flags then
+    if pfArray in Flags then
       Inc(Result, SizeOf(Integer));
   end;
 end;
 
-function TCallingConvention.ParameterPassingStrategy(
-  Parameter: TRttiParameter): TParameterPassingStrategy;
+function TCallingConvention.ParameterPassingStrategy(const Info: PTypeInfo;
+  const Flags: TParamFlags): TParameterPassingStrategy;
 begin
-  if pfVar in Parameter.Flags then
+  if pfVar in Flags then
     Result := ppByRef
-  else if pfOut in Parameter.Flags then
+  else if pfOut in Flags then
     Result := ppByRef
   else
   begin
-    if PassByRef(Parameter.ParamType.Handle, FCallConv) then
+    if PassByRef(Info, FCallConv) then
       Result := ppByRef
     else
       Result := ppByValue;
   end;
+end;
+
+function TCallingConvention.NumBytesForPassingParameterOnTheStack(
+  const Parameter: TRttiParameter): Integer;
+begin
+  Result := NumBytesForPassingParameterOnTheStack(Parameter.ParamType,
+    Parameter.Flags);
+end;
+
+function TCallingConvention.ParameterPassingStrategy(
+  const Parameter: TRttiParameter): TParameterPassingStrategy;
+begin
+  Result := ParameterPassingStrategy(Parameter.ParamType.Handle, Parameter.Flags);
 end;
 
 initialization

@@ -20,6 +20,7 @@
 			<Base>true</Base>
 		</PropertyGroup>
 		<PropertyGroup Condition="'$(Base)'!=''">
+			<DCC_DebugDCUs>true</DCC_DebugDCUs>
 			<DCC_IntegerOverflowCheck>true</DCC_IntegerOverflowCheck>
 			<DCC_RangeChecking>true</DCC_RangeChecking>
 			<DCC_UnitSearchPath>$(BDS)\Source\DUnit\src;..\Src;$(DCC_UnitSearchPath)</DCC_UnitSearchPath>
@@ -65,11 +66,15 @@
 			<DCCReference Include="..\Tests\Emballo.DynamicProxy.ImplTests.pas"/>
 			<DCCReference Include="..\Tests\Emballo.DllWrapper.ImplTests.pas"/>
 			<DCCReference Include="..\Tests\Emballo.Hash.Md5AlgorithmTests.pas"/>
-			<DCCReference Include="..\Tests\Emballo.DynamicProxy.MethodImplTests.pas"/>
 			<DCCReference Include="..\Tests\Emballo.SynteticClassTests.pas"/>
 			<DCCReference Include="..\Tests\Emballo.Mock.MockTests.pas"/>
 			<DCCReference Include="..\Tests\Emballo.DynamicProxy.InterfaceProxyTests.pas"/>
 			<DCCReference Include="..\Tests\Emballo.Mock.EqualsParameterMatcherTests.pas"/>
+			<DCCReference Include="..\Tests\Emballo.DynamicProxy.MethodImplTests_Cdecl.pas"/>
+			<DCCReference Include="..\Tests\Emballo.DynamicProxy.MethodImplTests_Pascal.pas"/>
+			<DCCReference Include="..\Tests\Emballo.DynamicProxy.MethodImplTests_Stdcall.pas"/>
+			<DCCReference Include="..\Tests\Emballo.DynamicProxy.MethodImplTests_Register.pas"/>
+			<DCCReference Include="..\Tests\Emballo.RuntimeCodeGeneration.MethodInvokationInfoTests.pas"/>
 			<BuildConfiguration Include="Base">
 				<Key>Base</Key>
 			</BuildConfiguration>
@@ -83,6 +88,10 @@
 			</BuildConfiguration>
 		</ItemGroup>
 		<Import Project="$(BDS)\Bin\CodeGear.Delphi.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Delphi.Targets')"/>
+		<PropertyGroup>
+			<PreBuildEvent><![CDATA[cd ..\Tests\Python
+python Emballo.DynamicProxy.MethodImplTests_CodeGen.py]]></PreBuildEvent>
+		</PropertyGroup>
 		<ProjectExtensions>
 			<Borland.Personality>Delphi.Personality.12</Borland.Personality>
 			<Borland.ProjectType/>

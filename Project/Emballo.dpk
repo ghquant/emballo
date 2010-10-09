@@ -95,6 +95,8 @@ contains
   Emballo.Mock.UnexpectedUsage in '..\Src\Emballo.Mock.UnexpectedUsage.pas',
   Emballo.Mock.When in '..\Src\Emballo.Mock.When.pas',
   Emballo.Mock.ParameterMatcher in '..\Src\Emballo.Mock.ParameterMatcher.pas',
-  Emballo.Mock.EqualsParameterMatcher in '..\Src\Emballo.Mock.EqualsParameterMatcher.pas';
+  Emballo.Mock.EqualsParameterMatcher in '..\Src\Emballo.Mock.EqualsParameterMatcher.pas',
+  Emballo.DynamicProxy.NativeToInvokationHandlerBridge in '..\Src\Emballo.DynamicProxy.NativeToInvokationHandlerBridge.pas',
+  Emballo.RuntimeCodeGeneration.MethodInvokationInfo in '..\Src\Emballo.RuntimeCodeGeneration.MethodInvokationInfo.pas';
 
 end.

@@ -27,7 +27,7 @@
 			<DCC_SymbolReferenceInfo>0</DCC_SymbolReferenceInfo>
 			<DCC_UnitAlias>WinTypes=Windows;WinProcs=Windows;DbiTypes=BDE;DbiProcs=BDE;DbiErrs=BDE;$(DCC_UnitAlias)</DCC_UnitAlias>
 			<DCC_Platform>x86</DCC_Platform>
-			<DCC_DependencyCheckOutputName>C:\Documents and Settings\All Users\Documentos\RAD Studio\7.0\Bpl\Emballo.bpl</DCC_DependencyCheckOutputName>
+			<DCC_DependencyCheckOutputName>C:\Users\Public\Documents\RAD Studio\7.0\Bpl\Emballo.bpl</DCC_DependencyCheckOutputName>
 			<GenPackage>true</GenPackage>
 			<DCC_N>false</DCC_N>
 			<DCC_S>false</DCC_S>
@@ -108,6 +108,8 @@
 			<DCCReference Include="..\Src\Emballo.Mock.When.pas"/>
 			<DCCReference Include="..\Src\Emballo.Mock.ParameterMatcher.pas"/>
 			<DCCReference Include="..\Src\Emballo.Mock.EqualsParameterMatcher.pas"/>
+			<DCCReference Include="..\Src\Emballo.DynamicProxy.NativeToInvokationHandlerBridge.pas"/>
+			<DCCReference Include="..\Src\Emballo.RuntimeCodeGeneration.MethodInvokationInfo.pas"/>
 			<None Include="..\Src\Emballo.TypeWrappers.TypeWrapperInterfaceTemplate.inc"/>
 			<BuildConfiguration Include="Base">
 				<Key>Base</Key>

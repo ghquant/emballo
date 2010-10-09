@@ -28,15 +28,22 @@ type
   TReturnValueMethodAction<T> = class(TInterfacedObject, IMethodAction)
   private
     FValue: T;
-    procedure Execute(const ResultParameter: IParameter);
+    FStrValue: String;
+  protected
+    procedure Execute(const ResultParameter: IParameter); virtual;
   public
     constructor Create(const Value: T);
+  end;
+
+  TReturnStringValueMethodAction = class(TReturnValueMethodAction<String>)
+  protected
+    procedure Execute(const ResultParameter: IParameter); override;
   end;
 
 implementation
 
 uses
-  TypInfo;
+  TypInfo, SysUtils;
 
 { TReturnValueMethodAction<T> }
 
@@ -50,6 +57,14 @@ begin
   case PTypeInfo(TypeInfo(T)).Kind of
     tkInteger: ResultParameter.AsInteger := PInteger(@FValue)^;
   end;
+end;
+
+{ TReturnStringValueMethodAction }
+
+procedure TReturnStringValueMethodAction.Execute(
+  const ResultParameter: IParameter);
+begin
+  ResultParameter.AsString := FValue;
 end;
 
 end.

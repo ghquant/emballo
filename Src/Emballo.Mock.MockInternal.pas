@@ -38,7 +38,8 @@ type
 
     function WillRaise(ExceptionClass: TExceptionClass): IWhen<T>;
 
-    function WillReturn(const Value: Integer): IWhen<T>;
+    function WillReturn(const Value: Integer): IWhen<T>; overload;
+    function WillReturn(const Value: String): IWhen<T>; overload;
   end;
 
 implementation

@@ -12,6 +12,7 @@ type
   public
     procedure Foo; virtual;
     function FooWithIntegerReturn: Integer; virtual;
+    function FooWithStringReturn: String; virtual;
     procedure FooWithParameters(const A: Integer); virtual;
   end;
 
@@ -32,6 +33,7 @@ type
     procedure VerifyUsageMustFailIfUsageWasNotAsExpected;
     procedure VerifyUsageMustNotFailIfUsageWasAsExpected;
     procedure MethodShouldReturnSpecifiedValue;
+    procedure ShouldReturnStringValue;
     procedure ShouldBeAbleToCastTheMockToTheMockedType;
   end;
 
@@ -76,7 +78,6 @@ end;
 
 procedure TMockTests.ShouldFailOnUnexpectedCalls;
 begin
-  { 1. Call a method that is unexpected }
   try
     FMock.GetObject.Foo;
     Fail('An unexpected usage of the mocked object should raise an EUnexpectedUsage');
@@ -107,6 +108,17 @@ begin
   except
     on ETestException do CheckTrue(True);
   end;
+end;
+
+procedure TMockTests.ShouldReturnStringValue;
+var
+  Str: String;
+begin
+  FMock.WillReturn('Test').When.FooWithStringReturn;
+
+
+  Str := FMock.GetObject.FooWithStringReturn;
+  CheckEquals('Test', Str);
 end;
 
 procedure TMockTests.TearDown;
@@ -150,6 +162,11 @@ end;
 procedure TMocked.FooWithParameters(const A: Integer);
 begin
 
+end;
+
+function TMocked.FooWithStringReturn: String;
+begin
+  Result := '';
 end;
 
 initialization
