@@ -14,6 +14,7 @@ type
     function FooWithIntegerReturn: Integer; virtual;
     function FooWithStringReturn: String; virtual;
     procedure FooWithParameters(const A: Integer); virtual;
+    procedure StringParameters(const S: String); virtual;
     function FooWithBooleanReturn: Boolean; virtual;
   end;
 
@@ -37,6 +38,7 @@ type
     procedure ShouldReturnStringValue;
     procedure ShouldBeAbleToCastTheMockToTheMockedType;
     procedure ShouldReturnBooleanValue;
+    procedure ShouldMatchStringArguments;
   end;
 
 implementation
@@ -95,6 +97,28 @@ begin
   try
     FMock.GetObject.FooWithParameters(11);
     Fail('Calling an expected method with unexpected parameters should fail');
+  except
+    on EUnexpectedUsage do CheckTrue(True);
+  end;
+end;
+
+procedure TMockTests.ShouldMatchStringArguments;
+  { Returns a new string with the same contents of another string.
+    This is make sure mocks compare strings based on it's contents, not on
+    it's memory address }
+  function CloneStr(const Str: String): String;
+  begin
+    SetLength(Result, Length(Str));
+    Move(Str[1], Result[1], Length(Str)*SizeOf(Char));
+  end;
+begin
+  FMock.Expects.StringParameters('Test');
+  FMock.GetObject.StringParameters(CloneStr('Test'));
+
+  FMock.Expects.StringParameters('Test');
+  try
+    FMock.GetObject.StringParameters('Test2');
+    Fail('aaa');
   except
     on EUnexpectedUsage do CheckTrue(True);
   end;
@@ -182,6 +206,11 @@ end;
 function TMocked.FooWithStringReturn: String;
 begin
   Result := '';
+end;
+
+procedure TMocked.StringParameters(const S: String);
+begin
+
 end;
 
 initialization

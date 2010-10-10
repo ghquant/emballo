@@ -20,11 +20,14 @@ unit Emballo.Mock.ParameterMatcher;
 
 interface
 
+uses
+  Emballo.DynamicProxy.InvokationHandler;
+
 type
   IParameterMatcher = interface
     ['{79BC1281-7B41-4CCD-8277-44AED43ECEBC}']
 
-    function Match(const Value: Variant): Boolean;
+    function Match(const Value: IParameter): Boolean;
   end;
 
 implementation

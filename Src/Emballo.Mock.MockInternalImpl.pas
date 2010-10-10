@@ -61,6 +61,7 @@ type
 implementation
 
 uses
+  TypInfo,
   Emballo.DynamicProxy.DynamicProxyService,
   Emballo.Mock.DummyMethodAction,
   Emballo.Mock.UnexpectedUsage,
@@ -119,7 +120,12 @@ begin
   FCurrentExpectation.Method := Method;
   SetLength(Matchers, Length(Parameters));
   for i := 0 to High(Matchers) do
-    Matchers[i] := TEqualsParameterMatcher<Integer>.Create(Parameters[i].AsInteger);
+  begin
+    if RttiParameters[i].ParamType.TypeKind = tkUString then
+      Matchers[i] := TEqualsParameterMatcher<String>.Create(Parameters[i].AsString)
+    else
+      Matchers[i] := TEqualsParameterMatcher<Integer>.Create(Parameters[i].AsInteger);
+  end;
 
   FCurrentExpectation.RegisterParameterMatchers(Matchers);
 
@@ -158,7 +164,7 @@ begin
     Exit;
 
   for i := 0 to High(Parameters) do
-    if not Expected.ParameterMatcher[i].Match(Parameters[i].AsInteger) then
+    if not Expected.ParameterMatcher[i].Match(Parameters[i]) then
       Exit;
 
   Result := True;

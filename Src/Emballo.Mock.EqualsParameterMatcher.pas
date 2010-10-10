@@ -21,18 +21,22 @@ unit Emballo.Mock.EqualsParameterMatcher;
 interface
 
 uses
-  Emballo.Mock.ParameterMatcher;
+  Emballo.Mock.ParameterMatcher,
+  Emballo.DynamicProxy.InvokationHandler;
 
 type
   TEqualsParameterMatcher<T> = class(TInterfacedObject, IParameterMatcher)
   private
     FValue: T;
-    function Match(const Value: Variant): Boolean;
+    function Match(const Value: IParameter): Boolean;
   public
     constructor Create(const Value: T);
   end;
 
 implementation
+
+uses
+  TypInfo;
 
 { TEqualsParameterMatcher<T> }
 
@@ -41,9 +45,12 @@ begin
   FValue := Value;
 end;
 
-function TEqualsParameterMatcher<T>.Match(const Value: Variant): Boolean;
+function TEqualsParameterMatcher<T>.Match(const Value: IParameter): Boolean;
 begin
-  Result := PInteger(@FValue)^ = Value;
+  if PTypeInfo(TypeInfo(T)).Kind = tkUString then
+    Result := PString(@FValue)^ = Value.AsString
+  else
+    Result := PInteger(@FValue)^ = Value.AsInteger;
 end;
 
 end.
