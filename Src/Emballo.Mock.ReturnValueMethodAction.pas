@@ -39,6 +39,11 @@ type
     procedure Execute(const ResultParameter: IParameter); override;
   end;
 
+  TReturnBooleanValueMethodAction = class(TReturnValueMethodAction<Boolean>)
+  protected
+    procedure Execute(const ResultParameter: IParameter); override;
+  end;
+
 implementation
 
 uses
@@ -64,6 +69,14 @@ procedure TReturnStringValueMethodAction.Execute(
   const ResultParameter: IParameter);
 begin
   ResultParameter.AsString := FValue;
+end;
+
+{ TReturnBooleanValueMethodAction }
+
+procedure TReturnBooleanValueMethodAction.Execute(
+  const ResultParameter: IParameter);
+begin
+  ResultParameter.AsBoolean := FValue;
 end;
 
 end.

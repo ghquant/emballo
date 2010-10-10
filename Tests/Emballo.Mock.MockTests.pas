@@ -14,6 +14,7 @@ type
     function FooWithIntegerReturn: Integer; virtual;
     function FooWithStringReturn: String; virtual;
     procedure FooWithParameters(const A: Integer); virtual;
+    function FooWithBooleanReturn: Boolean; virtual;
   end;
 
   ETestException = class(Exception)
@@ -35,6 +36,7 @@ type
     procedure MethodShouldReturnSpecifiedValue;
     procedure ShouldReturnStringValue;
     procedure ShouldBeAbleToCastTheMockToTheMockedType;
+    procedure ShouldReturnBooleanValue;
   end;
 
 implementation
@@ -110,12 +112,20 @@ begin
   end;
 end;
 
+procedure TMockTests.ShouldReturnBooleanValue;
+begin
+  FMock.WillReturn(True).When.FooWithBooleanReturn;
+  CheckTrue(FMock.GetObject.FooWithBooleanReturn, 'Didn''t return the defined "True" value');
+
+  FMock.WillReturn(False).When.FooWithBooleanReturn;
+  CheckFalse(FMock.GetObject.FooWithBooleanReturn, 'Didn''t return the defined "False" value');
+end;
+
 procedure TMockTests.ShouldReturnStringValue;
 var
   Str: String;
 begin
   FMock.WillReturn('Test').When.FooWithStringReturn;
-
 
   Str := FMock.GetObject.FooWithStringReturn;
   CheckEquals('Test', Str);
@@ -152,6 +162,11 @@ end;
 
 procedure TMocked.Foo;
 begin
+end;
+
+function TMocked.FooWithBooleanReturn: Boolean;
+begin
+  Result := False;
 end;
 
 function TMocked.FooWithIntegerReturn: Integer;
